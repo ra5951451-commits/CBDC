@@ -1,0 +1,784 @@
+{
+  "metadata": {
+    "district": "મહેસાણા",
+    "taluka": "ઉઝાં",
+    "fps_area": "પટેલ બાબુભાઈ કાશીરામદાસ : 2312 (પળી : 14785 - કાયમી )",
+    "generated_on": "03/03/2026 13:44:12 :"
+  },
+  "beneficiaries": [
+    {
+      "sr_no": 1,
+      "name": "THAKOR AROHIBEN RAMAJI",
+      "ration_card": "30400 30077 57677",
+      "clean_ration_card": "304003007757677"
+    },
+    {
+      "sr_no": 2,
+      "name": "PATEL VATSAL MAHESHBHAI",
+      "ration_card": "10400 30115 19992",
+      "clean_ration_card": "104003011519992"
+    },
+    {
+      "sr_no": 3,
+      "name": "RAJPUT INDUBEN",
+      "ration_card": "10400 30143 05034",
+      "clean_ration_card": "104003014305034"
+    },
+    {
+      "sr_no": 4,
+      "name": "THAKOR JAIMIN RAJUJI",
+      "ration_card": "10400 30154 02395",
+      "clean_ration_card": "104003015402395"
+    },
+    {
+      "sr_no": 5,
+      "name": "RAVAL JANVIBEN AJITBHAI",
+      "ration_card": "10400 30135 19902",
+      "clean_ration_card": "104003013519902"
+    },
+    {
+      "sr_no": 6,
+      "name": "RAJPUT SHAURYARAJSINH DHAVALSINH",
+      "ration_card": "10400 30041 20560",
+      "clean_ration_card": "104003004120560"
+    },
+    {
+      "sr_no": 7,
+      "name": "RAJPUT JIYANJI SURESHJI",
+      "ration_card": "30400 30040 98501",
+      "clean_ration_card": "304003004098501"
+    },
+    {
+      "sr_no": 8,
+      "name": "PARMAR PARTHKUMAR HARESHBHAI",
+      "ration_card": "40400 30116 38322",
+      "clean_ration_card": "404003011638322"
+    },
+    {
+      "sr_no": 9,
+      "name": "LANGA UMERABANU SADDAMHUSEN",
+      "ration_card": "30400 30077 57703",
+      "clean_ration_card": "304003007757703"
+    },
+    {
+      "sr_no": 10,
+      "name": "THAKOR HETALBEN JAYANTIJI",
+      "ration_card": "40400 30040 98126",
+      "clean_ration_card": "404003004098126"
+    },
+    {
+      "sr_no": 11,
+      "name": "RAJPUT MEETSINH HARKISHANSINH",
+      "ration_card": "10400 30077 57152",
+      "clean_ration_card": "104003007757152"
+    },
+    {
+      "sr_no": 12,
+      "name": "THAKOR TIKABEN",
+      "ration_card": "10400 30154 02395",
+      "clean_ration_card": "104003015402395"
+    },
+    {
+      "sr_no": 13,
+      "name": "RAVAL MANUBEN AJITBHAI",
+      "ration_card": "10400 30135 19902",
+      "clean_ration_card": "104003013519902"
+    },
+    {
+      "sr_no": 14,
+      "name": "PARMAR NILAMBEN VISHALKUMAR",
+      "ration_card": "10400 30110 64334",
+      "clean_ration_card": "104003011064334"
+    },
+    {
+      "sr_no": 15,
+      "name": "RAJPUT NILAMBEN",
+      "ration_card": "10400 30140 72289",
+      "clean_ration_card": "104003014072289"
+    },
+    {
+      "sr_no": 16,
+      "name": "PATEL KARM VISHALBHAI",
+      "ration_card": "10400 30117 52447",
+      "clean_ration_card": "104003011752447"
+    },
+    {
+      "sr_no": 17,
+      "name": "THAKOR RUDRASINH SUMANJI",
+      "ration_card": "10400 30135 25590",
+      "clean_ration_card": "104003013525590"
+    },
+    {
+      "sr_no": 18,
+      "name": "PRAGATIBEN YUVRAJSINH RAJPUT",
+      "ration_card": "10400 30041 20560",
+      "clean_ration_card": "104003004120560"
+    },
+    {
+      "sr_no": 19,
+      "name": "RAJPUT SHIVARAJ RAJENDRASINH",
+      "ration_card": "10400 30143 20406",
+      "clean_ration_card": "104003014320406"
+    },
+    {
+      "sr_no": 20,
+      "name": "THAKOR RAVI JAYANTIJI",
+      "ration_card": "40400 30040 98126",
+      "clean_ration_card": "404003004098126"
+    },
+    {
+      "sr_no": 21,
+      "name": "VAGHRI SONIBEN BHAGVANBHAI",
+      "ration_card": "10400 30137 17895",
+      "clean_ration_card": "104003013717895"
+    },
+    {
+      "sr_no": 22,
+      "name": "THAKOR BHARATJI",
+      "ration_card": "10400 30146 18934",
+      "clean_ration_card": "104003014618934"
+    },
+    {
+      "sr_no": 23,
+      "name": "THAKOR DEVANSHI RAMANJI",
+      "ration_card": "30400 30040 98534",
+      "clean_ration_card": "304003004098534"
+    },
+    {
+      "sr_no": 24,
+      "name": "SAIYAD SANABIBI SHAAKIRMIYA",
+      "ration_card": "10400 30119 36360",
+      "clean_ration_card": "104003011936360"
+    },
+    {
+      "sr_no": 25,
+      "name": "RAJPUT MITARAJSINH KANAKSINH",
+      "ration_card": "10400 30138 00987",
+      "clean_ration_card": "104003013800987"
+    },
+    {
+      "sr_no": 26,
+      "name": "RAJPUT MANISHABA JAYDIPSINH",
+      "ration_card": "10400 30041 20756",
+      "clean_ration_card": "104003004120756"
+    },
+    {
+      "sr_no": 27,
+      "name": "DIPIKABEN ALKESHBHAI PATEL",
+      "ration_card": "10400 30077 57568",
+      "clean_ration_card": "104003007757568"
+    },
+    {
+      "sr_no": 28,
+      "name": "PARMAR DISHITA PRAHLAD",
+      "ration_card": "40400 30040 98315",
+      "clean_ration_card": "404003004098315"
+    },
+    {
+      "sr_no": 29,
+      "name": "VISHVARAJSINH KANAKSINH RAJPUT",
+      "ration_card": "10400 30138 00987",
+      "clean_ration_card": "104003013800987"
+    },
+    {
+      "sr_no": 30,
+      "name": "PARMAR RAVIKUMAR KANUBHAI",
+      "ration_card": "10400 30146 23993",
+      "clean_ration_card": "104003014623993"
+    },
+    {
+      "sr_no": 31,
+      "name": "RAJPUT RAJESHKUMAR BALDEVJI",
+      "ration_card": "10400 30140 72290",
+      "clean_ration_card": "104003014072290"
+    },
+    {
+      "sr_no": 32,
+      "name": "PARMAR SHAILESHKUMAR VISHNUBHAI",
+      "ration_card": "10400 30147 58984",
+      "clean_ration_card": "104003014758984"
+    },
+    {
+      "sr_no": 33,
+      "name": "RAVAL GOPALBHAI",
+      "ration_card": "10400 30150 03291",
+      "clean_ration_card": "104003015003291"
+    },
+    {
+      "sr_no": 34,
+      "name": "RAJPUT KHUSHI BHAVESHJI",
+      "ration_card": "10400 30041 20766",
+      "clean_ration_card": "104003004120766"
+    },
+    {
+      "sr_no": 35,
+      "name": "RAJPUT PRAKASHBEN",
+      "ration_card": "10400 30143 20406",
+      "clean_ration_card": "104003014320406"
+    },
+    {
+      "sr_no": 36,
+      "name": "VAGHELA POOJABEN",
+      "ration_card": "40400 30040 98363",
+      "clean_ration_card": "404003004098363"
+    },
+    {
+      "sr_no": 37,
+      "name": "PATEL HAKSH VIJAYKUMAR",
+      "ration_card": "30400 30040 98666",
+      "clean_ration_card": "304003004098666"
+    },
+    {
+      "sr_no": 38,
+      "name": "RAJPUT CHETANABEN NARENDRASINH",
+      "ration_card": "10400 30147 02438",
+      "clean_ration_card": "104003014702438"
+    },
+    {
+      "sr_no": 39,
+      "name": "MIHIRKUMAR ALKESHBHAI PATEL",
+      "ration_card": "10400 30077 57568",
+      "clean_ration_card": "104003007757568"
+    },
+    {
+      "sr_no": 40,
+      "name": "PARMAR AROHI SHAILESHKUMAR",
+      "ration_card": "10400 30147 58984",
+      "clean_ration_card": "104003014758984"
+    },
+    {
+      "sr_no": 41,
+      "name": "AROHI RAJESHKUMAR RAJPUT",
+      "ration_card": "10400 30140 72290",
+      "clean_ration_card": "104003014072290"
+    },
+    {
+      "sr_no": 42,
+      "name": "THAKOR SACHINKUMAR GURUDYALSING",
+      "ration_card": "10400 30041 20783",
+      "clean_ration_card": "104003004120783"
+    },
+    {
+      "sr_no": 43,
+      "name": "MAHENDRASINH RAJPUT",
+      "ration_card": "10400 30143 83082",
+      "clean_ration_card": "104003014383082"
+    },
+    {
+      "sr_no": 44,
+      "name": "VAGHARI SANJAY",
+      "ration_card": "40400 30040 98376",
+      "clean_ration_card": "404003004098376"
+    },
+    {
+      "sr_no": 45,
+      "name": "RABARI VIHANI LAGDHIRBHAI",
+      "ration_card": "30400 30040 98778",
+      "clean_ration_card": "304003004098778"
+    },
+    {
+      "sr_no": 46,
+      "name": "YUG",
+      "ration_card": "10400 30041 20790",
+      "clean_ration_card": "104003004120790"
+    },
+    {
+      "sr_no": 47,
+      "name": "RAJENDRA SINGH RAJPUT",
+      "ration_card": "10400 30144 48620",
+      "clean_ration_card": "104003014448620"
+    },
+    {
+      "sr_no": 48,
+      "name": "PATEL RATILAL BABULAL",
+      "ration_card": "40400 30043 66409",
+      "clean_ration_card": "404003004366409"
+    },
+    {
+      "sr_no": 49,
+      "name": "PARMAR SANDIPKUMAR RAMESHBHAI",
+      "ration_card": "10400 30151 86267",
+      "clean_ration_card": "104003015186267"
+    },
+    {
+      "sr_no": 50,
+      "name": "DITYA MAYURPURI GOSWAMI",
+      "ration_card": "10400 30041 20790",
+      "clean_ration_card": "104003004120790"
+    },
+    {
+      "sr_no": 51,
+      "name": "SAVITA RAJPUT",
+      "ration_card": "10400 30144 48620",
+      "clean_ration_card": "104003014448620"
+    },
+    {
+      "sr_no": 52,
+      "name": "BHAVIKA MUKESHBHAI MAKVANA",
+      "ration_card": "10400 30124 49105",
+      "clean_ration_card": "104003012449105"
+    },
+    {
+      "sr_no": 53,
+      "name": "THAKOR SHRADHABEN",
+      "ration_card": "30400 30040 98934",
+      "clean_ration_card": "304003004098934"
+    },
+    {
+      "sr_no": 54,
+      "name": "PATEL KANUBHAI MAGANDAS",
+      "ration_card": "10400 30041 20837",
+      "clean_ration_card": "104003004120837"
+    },
+    {
+      "sr_no": 55,
+      "name": "POOJA RAJPUT",
+      "ration_card": "10400 30144 48620",
+      "clean_ration_card": "104003014448620"
+    },
+    {
+      "sr_no": 56,
+      "name": "PARMAR MAAHIL BHARATBHAI",
+      "ration_card": "10400 30130 55869",
+      "clean_ration_card": "104003013055869"
+    },
+    {
+      "sr_no": 57,
+      "name": "PARMAR VARSHABEN SANDIPKUMAR",
+      "ration_card": "10400 30151 86267",
+      "clean_ration_card": "104003015186267"
+    },
+    {
+      "sr_no": 58,
+      "name": "JAGDISHBHAI KANUBHAI PATEL",
+      "ration_card": "10400 30041 20837",
+      "clean_ration_card": "104003004120837"
+    },
+    {
+      "sr_no": 59,
+      "name": "RAJPUT VIKRAMSINH VAJESINH",
+      "ration_card": "10400 30144 84078",
+      "clean_ration_card": "104003014484078"
+    },
+    {
+      "sr_no": 60,
+      "name": "RAJPUT BHAVYARAJ HARESHSINH",
+      "ration_card": "10400 30131 19197",
+      "clean_ration_card": "104003013119197"
+    },
+    {
+      "sr_no": 61,
+      "name": "SUMITBHAI SURESHBHAI VAGHARI",
+      "ration_card": "30400 30040 99025",
+      "clean_ration_card": "304003004099025"
+    },
+    {
+      "sr_no": 62,
+      "name": "PATEL JIGNESH KUMAR",
+      "ration_card": "10400 30041 20837",
+      "clean_ration_card": "104003004120837"
+    },
+    {
+      "sr_no": 63,
+      "name": "RAJPUT NITABEN",
+      "ration_card": "10400 30144 84078",
+      "clean_ration_card": "104003014484078"
+    },
+    {
+      "sr_no": 64,
+      "name": "ANJANABEN JAGDISHBHAI PATEL",
+      "ration_card": "10400 30041 20837",
+      "clean_ration_card": "104003004120837"
+    },
+    {
+      "sr_no": 65,
+      "name": "PRAJAPATI KUNJ JIGNESHKUMAR",
+      "ration_card": "10400 30152 47089",
+      "clean_ration_card": "104003015247089"
+    },
+    {
+      "sr_no": 66,
+      "name": "RAJPUT SHILPABEN UMEDJI",
+      "ration_card": "10400 30041 20908",
+      "clean_ration_card": "104003004120908"
+    },
+    {
+      "sr_no": 67,
+      "name": "RAJPUT RAJSINH",
+      "ration_card": "10400 30144 84078",
+      "clean_ration_card": "104003014484078"
+    },
+    {
+      "sr_no": 68,
+      "name": "SEJALBEN BHAUMIKKUMAR PATEL",
+      "ration_card": "10400 30041 20978",
+      "clean_ration_card": "104003004120978"
+    },
+    {
+      "sr_no": 69,
+      "name": "THAKOR JAYKUMAR",
+      "ration_card": "30400 30040 99104",
+      "clean_ration_card": "304003004099104"
+    },
+    {
+      "sr_no": 70,
+      "name": "PATEL MAYRA BRIJESHKUMAR",
+      "ration_card": "10400 30041 21079",
+      "clean_ration_card": "104003004121079"
+    },
+    {
+      "sr_no": 71,
+      "name": "RAJPUT RIYA",
+      "ration_card": "10400 30144 84078",
+      "clean_ration_card": "104003014484078"
+    },
+    {
+      "sr_no": 72,
+      "name": "RAJPUT KUNVARBA MAULESHJI",
+      "ration_card": "10400 30041 21166",
+      "clean_ration_card": "104003004121166"
+    },
+    {
+      "sr_no": 73,
+      "name": "SAIYAD ALTAFMIYA",
+      "ration_card": "10400 30152 54603",
+      "clean_ration_card": "104003015254603"
+    },
+    {
+      "sr_no": 74,
+      "name": "KIRANJI VIKRAMJI THAKOR",
+      "ration_card": "10400 30041 21331",
+      "clean_ration_card": "104003004121331"
+    },
+    {
+      "sr_no": 75,
+      "name": "PATEL ANITABEN RAKESHKUMAR",
+      "ration_card": "30400 30040 99246",
+      "clean_ration_card": "304003004099246"
+    },
+    {
+      "sr_no": 76,
+      "name": "RAJPUT GAURANGSINH VIJAYSINH",
+      "ration_card": "10400 30041 21501",
+      "clean_ration_card": "104003004121501"
+    },
+    {
+      "sr_no": 77,
+      "name": "URMILABEN KANTIJI THAKOR",
+      "ration_card": "10400 30152 98127",
+      "clean_ration_card": "104003015298127"
+    },
+    {
+      "sr_no": 78,
+      "name": "BHANGI URMILABEN ARVINDKUMAR",
+      "ration_card": "10400 30041 21517",
+      "clean_ration_card": "104003004121517"
+    },
+    {
+      "sr_no": 79,
+      "name": "PRADIPKUMAR BHANGI",
+      "ration_card": "30400 30040 99372",
+      "clean_ration_card": "304003004099372"
+    },
+    {
+      "sr_no": 80,
+      "name": "BHANGI DEVKUMAR ARVINDBHAI",
+      "ration_card": "10400 30041 21517",
+      "clean_ration_card": "104003004121517"
+    },
+    {
+      "sr_no": 81,
+      "name": "THAKOR HETALBEN KIRANJI",
+      "ration_card": "30400 30040 99432",
+      "clean_ration_card": "304003004099432"
+    },
+    {
+      "sr_no": 82,
+      "name": "ANITABEN HARDIKJI THAKOR",
+      "ration_card": "10400 30041 21632",
+      "clean_ration_card": "104003004121632"
+    },
+    {
+      "sr_no": 83,
+      "name": "RAJPUT PARIDHI HITENDRASINH",
+      "ration_card": "30400 30040 99446",
+      "clean_ration_card": "304003004099446"
+    },
+    {
+      "sr_no": 84,
+      "name": "AARVIBEN HARSHADSINH RAJPUT",
+      "ration_card": "10400 30041 21790",
+      "clean_ration_card": "104003004121790"
+    },
+    {
+      "sr_no": 85,
+      "name": "RAJPUT FRIYANSIBEN PREMDEEPSINH",
+      "ration_card": "30400 30040 99610",
+      "clean_ration_card": "304003004099610"
+    },
+    {
+      "sr_no": 86,
+      "name": "PAYALBEN AJAYBHAI PATEL",
+      "ration_card": "10400 30041 21819",
+      "clean_ration_card": "104003004121819"
+    },
+    {
+      "sr_no": 87,
+      "name": "RAJPUT KUDANSINH",
+      "ration_card": "30400 30040 99631",
+      "clean_ration_card": "304003004099631"
+    },
+    {
+      "sr_no": 88,
+      "name": "RAJPUT DHARMIBEN JASPALSINH",
+      "ration_card": "10400 30041 21955",
+      "clean_ration_card": "104003004121955"
+    },
+    {
+      "sr_no": 89,
+      "name": "RAJPUT KANKUBEN BHARATSINH",
+      "ration_card": "30400 30040 99631",
+      "clean_ration_card": "304003004099631"
+    },
+    {
+      "sr_no": 90,
+      "name": "RAJPUT JAYABEN MAHIPATSINH",
+      "ration_card": "10400 30041 21995",
+      "clean_ration_card": "104003004121995"
+    },
+    {
+      "sr_no": 91,
+      "name": "RAJPUT KISMATSINH AMARSINH",
+      "ration_card": "30400 30040 99631",
+      "clean_ration_card": "304003004099631"
+    },
+    {
+      "sr_no": 92,
+      "name": "RAJPUT DIYANSIBA MAHIPATSINH",
+      "ration_card": "10400 30041 21995",
+      "clean_ration_card": "104003004121995"
+    },
+    {
+      "sr_no": 93,
+      "name": "THAKOR HIRALBEN",
+      "ration_card": "30400 30041 00989",
+      "clean_ration_card": "304003004100989"
+    },
+    {
+      "sr_no": 94,
+      "name": "RAJPUT HASUMATIBEN PRAVINSINH",
+      "ration_card": "10400 30041 21995",
+      "clean_ration_card": "104003004121995"
+    },
+    {
+      "sr_no": 95,
+      "name": "THAKOR ARMANJI VISHNUJI",
+      "ration_card": "30400 30041 00989",
+      "clean_ration_card": "304003004100989"
+    },
+    {
+      "sr_no": 96,
+      "name": "PRADHYUMANSINH PRAVINSINH RAJPUT",
+      "ration_card": "10400 30041 21995",
+      "clean_ration_card": "104003004121995"
+    },
+    {
+      "sr_no": 97,
+      "name": "THAKOR NAVYA VISHNUJI",
+      "ration_card": "30400 30041 00989",
+      "clean_ration_card": "304003004100989"
+    },
+    {
+      "sr_no": 98,
+      "name": "RAJPUT ANANDIBEN AMITSINH",
+      "ration_card": "10400 30041 31388",
+      "clean_ration_card": "104003004131388"
+    },
+    {
+      "sr_no": 99,
+      "name": "RAJPUT JAYRAJSINH RAKESHKUMAR",
+      "ration_card": "30400 30041 01004",
+      "clean_ration_card": "304003004101004"
+    },
+    {
+      "sr_no": 100,
+      "name": "THAKOR NISHABEN MAHESHJI",
+      "ration_card": "10400 30041 31810",
+      "clean_ration_card": "104003004131810"
+    },
+    {
+      "sr_no": 101,
+      "name": "RAJPUT TANVIBEN RAKESHKUMAR",
+      "ration_card": "30400 30041 01004",
+      "clean_ration_card": "304003004101004"
+    },
+    {
+      "sr_no": 102,
+      "name": "THAKOR TUSHAR",
+      "ration_card": "10400 30041 31810",
+      "clean_ration_card": "104003004131810"
+    },
+    {
+      "sr_no": 103,
+      "name": "VAGHARI ARYANKUMAR POPATBHAI",
+      "ration_card": "30400 30041 01358",
+      "clean_ration_card": "304003004101358"
+    },
+    {
+      "sr_no": 104,
+      "name": "RAJPUT ANJANABEN KIRANSINH",
+      "ration_card": "10400 30041 32225",
+      "clean_ration_card": "104003004132225"
+    },
+    {
+      "sr_no": 105,
+      "name": "RAVAL AKASHKUMAR",
+      "ration_card": "30400 30041 01402",
+      "clean_ration_card": "304003004101402"
+    },
+    {
+      "sr_no": 106,
+      "name": "THAKOR PUNAM JASHVANTJI",
+      "ration_card": "10400 30041 32365",
+      "clean_ration_card": "104003004132365"
+    },
+    {
+      "sr_no": 107,
+      "name": "RAVAL KIRAN KUMAR",
+      "ration_card": "30400 30041 01402",
+      "clean_ration_card": "304003004101402"
+    },
+    {
+      "sr_no": 108,
+      "name": "NILESHJI JASHAVANTJI THAKOR",
+      "ration_card": "10400 30041 32365",
+      "clean_ration_card": "104003004132365"
+    },
+    {
+      "sr_no": 109,
+      "name": "RABARI MEETBHAI BHIKHABHAI",
+      "ration_card": "30400 30041 01434",
+      "clean_ration_card": "304003004101434"
+    },
+    {
+      "sr_no": 110,
+      "name": "THAKOR JUMIBEN ISHWARJI",
+      "ration_card": "10400 30041 32365",
+      "clean_ration_card": "104003004132365"
+    },
+    {
+      "sr_no": 111,
+      "name": "PANCHAL RINKAL SANDIPKUMAR",
+      "ration_card": "30400 30043 66100",
+      "clean_ration_card": "304003004366100"
+    },
+    {
+      "sr_no": 112,
+      "name": "SAIYAD MAHMAD AJAJMIYA",
+      "ration_card": "10400 30041 32507",
+      "clean_ration_card": "104003004132507"
+    },
+    {
+      "sr_no": 113,
+      "name": "RABARI SANJAY",
+      "ration_card": "30400 30043 66188",
+      "clean_ration_card": "304003004366188"
+    },
+    {
+      "sr_no": 114,
+      "name": "SAIYAD NAFISHA BIBI MAHMAD AJAJ MIYA",
+      "ration_card": "10400 30041 32507",
+      "clean_ration_card": "104003004132507"
+    },
+    {
+      "sr_no": 115,
+      "name": "NAITIK VIJAYBHAI BHANGI",
+      "ration_card": "30400 30043 66226",
+      "clean_ration_card": "304003004366226"
+    },
+    {
+      "sr_no": 116,
+      "name": "KINJALBEN SANJAYSINH RAJPUT",
+      "ration_card": "10400 30041 33009",
+      "clean_ration_card": "104003004133009"
+    },
+    {
+      "sr_no": 117,
+      "name": "VISHALKUMAR PATEL",
+      "ration_card": "10400 30041 33102",
+      "clean_ration_card": "104003004133102"
+    },
+    {
+      "sr_no": 118,
+      "name": "RAJPUT BHUPATSINH PRATAPJI",
+      "ration_card": "10400 30041 33153",
+      "clean_ration_card": "104003004133153"
+    },
+    {
+      "sr_no": 119,
+      "name": "RAJPUT KAILASHBEN BHUPATSINH",
+      "ration_card": "10400 30041 33153",
+      "clean_ration_card": "104003004133153"
+    },
+    {
+      "sr_no": 120,
+      "name": "PANCHOLI KEYAN NIKUNJKUMAR",
+      "ration_card": "10400 30041 33287",
+      "clean_ration_card": "104003004133287"
+    },
+    {
+      "sr_no": 121,
+      "name": "PARMAR VISHVA MINABEN",
+      "ration_card": "10400 30041 33330",
+      "clean_ration_card": "104003004133330"
+    },
+    {
+      "sr_no": 122,
+      "name": "PARMAR MINABEN JETHABHAI",
+      "ration_card": "10400 30041 33330",
+      "clean_ration_card": "104003004133330"
+    },
+    {
+      "sr_no": 123,
+      "name": "RAJPUT KRISHABA MEHULKUMAR",
+      "ration_card": "10400 30041 33425",
+      "clean_ration_card": "104003004133425"
+    },
+    {
+      "sr_no": 124,
+      "name": "SAIYAD DAUDMIYA AKHTARMIYA",
+      "ration_card": "10400 30041 33443",
+      "clean_ration_card": "104003004133443"
+    },
+    {
+      "sr_no": 125,
+      "name": "SAIYAD FATEMABIBI MUSTAKMIYA",
+      "ration_card": "10400 30041 33537",
+      "clean_ration_card": "104003004133537"
+    },
+    {
+      "sr_no": 126,
+      "name": "SAIYAD NIDABIBI JAVEDMIYA",
+      "ration_card": "10400 30041 33658",
+      "clean_ration_card": "104003004133658"
+    },
+    {
+      "sr_no": 127,
+      "name": "ALIYABIBI ATIKMIYA SAIYAD",
+      "ration_card": "10400 30041 33766",
+      "clean_ration_card": "104003004133766"
+    },
+    {
+      "sr_no": 128,
+      "name": "THAKOR KARNAJI",
+      "ration_card": "10400 30041 33848",
+      "clean_ration_card": "104003004133848"
+    },
+    {
+      "sr_no": 129,
+      "name": "BHANGI NIDHI VIJAYKUMAR",
+      "ration_card": "10400 30043 65609",
+      "clean_ration_card": "104003004365609"
+    }
+  ]
+}
