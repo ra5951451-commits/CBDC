@@ -33,6 +33,31 @@
   --border-radius-sm: 8px;
   --border-radius-md: 16px;
   --border-radius-lg: 24px;
+
+  /* Fluid Spacing & Containers */
+  --container-padding-mobile: 16px;
+  --container-padding-tablet: 24px;
+  --container-padding-desktop: 32px;
+  --max-content-width: 1200px;
+  --max-desktop-content-width: 1320px;
+}
+
+/* Focus outline styling for keyboard accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+.action-card:focus-visible,
+.household-card:focus-visible {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+.action-card:focus:not(:focus-visible),
+.household-card:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Reset and Base Styles */
@@ -1192,10 +1217,99 @@ button, input {
 }
 
 /* ==========================================================================
-   Responsive Desktop Layout Upgrades (Screen Width > 768px)
+   Responsive Tablet Layout Upgrades (600px – 1023px)
    ========================================================================== */
-@media (min-width: 769px) {
-  /* Layout Adjustments */
+@media (min-width: 600px) {
+  .app-header {
+    padding: 16px 24px;
+  }
+
+  .header-logo {
+    width: 56px;
+    height: 56px;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .header-subtitle {
+    font-size: 12px;
+  }
+
+  .app-content {
+    padding: 24px;
+    padding-bottom: 96px; /* Room for bottom nav on tablet */
+  }
+
+  /* Home Banner Type Scaling */
+  .welcome-banner {
+    padding: 32px 24px;
+  }
+
+  .welcome-banner h2 {
+    font-size: 26px;
+  }
+
+  /* Inline Search Card layout on tablet */
+  .quick-search-card .card-body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-grow: 1;
+    width: 100%;
+  }
+
+  .quick-search-card .card-text-block {
+    flex: 1.2;
+  }
+
+  .quick-search-card .search-form {
+    flex: 1;
+    max-width: 380px;
+    margin-bottom: 0;
+  }
+
+  /* Symmetrical 2-column grid for list on tablet */
+  .beneficiaries-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  .household-card {
+    margin-bottom: 0;
+  }
+
+  /* Centered process steps flow for tablet */
+  .process-flow {
+    max-width: 720px;
+    margin: 16px auto 0 auto;
+  }
+
+  .video-container-card {
+    max-width: 720px;
+    margin: 24px auto 0 auto;
+  }
+
+  /* Centered info container for tablet */
+  .simple-info-container {
+    max-width: 720px;
+    margin: 16px auto 0 auto;
+  }
+}
+
+/* ==========================================================================
+   Responsive Desktop Layout Upgrades (1024px – 1439px)
+   ========================================================================== */
+@media (min-width: 1024px) {
+  .app-header {
+    padding: 16px 32px;
+  }
+
   .app-navbar {
     display: none; /* Hide bottom navbar on desktop */
   }
@@ -1203,7 +1317,7 @@ button, input {
   .desktop-nav {
     display: flex; /* Show desktop navigation menu */
     align-items: center;
-    gap: 12px;
+    gap: 14px;
   }
 
   /* Style navigation buttons in header */
@@ -1214,7 +1328,7 @@ button, input {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    padding: 8px 16px;
+    padding: 10px 18px;
     border-radius: var(--border-radius-sm);
     transition: all var(--transition-fast);
     outline: none;
@@ -1232,16 +1346,15 @@ button, input {
     border: none;
   }
 
-  /* Adjust main container spacing (no bottom nav) */
   .app-content {
-    padding-bottom: 40px;
-    max-width: 1200px;
+    padding: 32px 0 48px 0;
+    max-width: var(--max-content-width);
     margin: 0 auto;
     width: 100%;
   }
 
   .tab-content {
-    max-width: 1200px;
+    max-width: var(--max-content-width);
     margin: 0 auto;
   }
 
@@ -1260,18 +1373,35 @@ button, input {
   }
 
   /* Inline quick search form on desktop */
-  .quick-search-card h3 {
-    font-size: 18px;
+  .quick-search-card .card-body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-grow: 1;
+    width: 100%;
   }
 
-  .search-form {
-    max-width: 700px;
+  .quick-search-card .card-text-block {
+    flex: 1.3;
+  }
+
+  .quick-search-card .search-form {
+    flex: 1;
+    max-width: 450px;
+    margin-bottom: 0;
+  }
+
+  .grid-actions {
+    gap: 24px;
+    margin-bottom: 32px;
   }
 
   /* List Tab Responsive Dashboard Grid */
   .search-sticky-container {
     top: 74px; /* Sync with header height on desktop */
-    padding: 8px 0 16px 0;
+    padding: 12px 0 20px 0;
   }
 
   .search-input-wrapper {
@@ -1284,7 +1414,7 @@ button, input {
     margin: 16px auto;
   }
 
-  /* Grid layout for beneficiary list */
+  /* Grid layout for beneficiary list on desktop (3-4 columns) */
   .beneficiaries-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -1292,19 +1422,16 @@ button, input {
     margin-top: 10px;
   }
 
-  .household-card {
-    margin-bottom: 0; /* Handled by grid gap */
-  }
-
   .load-more-container {
     max-width: 300px;
-    margin: 24px auto;
+    margin: 32px auto 0 auto;
   }
 
   /* Process Tab Layout centering */
   .process-flow {
     max-width: 800px;
-    margin: 20px auto 0 auto;
+    margin: 24px auto 0 auto;
+    gap: 20px;
   }
 
   /* Video Guide Card styling on desktop */
@@ -1316,8 +1443,54 @@ button, input {
   /* More Info Tab Responsive Grid Layout */
   .simple-info-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
+    max-width: 100%;
     align-items: start;
+    margin-top: 16px;
+  }
+}
+
+/* ==========================================================================
+   Responsive Large Desktop Layout Upgrades (≥ 1440px)
+   ========================================================================== */
+@media (min-width: 1440px) {
+  .app-header {
+    padding: 18px 0;
+  }
+
+  .header-container {
+    max-width: var(--max-desktop-content-width);
+    padding: 0 var(--container-padding-desktop);
+  }
+
+  .app-content {
+    max-width: var(--max-desktop-content-width);
+    padding: 48px 0 64px 0;
+  }
+
+  .tab-content {
+    max-width: var(--max-desktop-content-width);
+  }
+
+  .welcome-banner {
+    padding: 48px 40px;
+  }
+
+  .welcome-banner h2 {
+    font-size: 34px;
+  }
+
+  .welcome-banner p {
+    font-size: 17px;
+  }
+
+  /* Process Tab Layout widening on large desktop */
+  .process-flow {
+    max-width: 960px;
+  }
+
+  .video-container-card {
+    max-width: 960px;
   }
 }
