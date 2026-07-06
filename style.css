@@ -23,9 +23,9 @@
   --border-light: #e2e8f0;       /* Neutral light border */
   
   --success-color: #10b981;      /* Green for active/verified */
-  --shadow-sm: 0 2px 8px rgba(11, 26, 58, 0.05);
-  --shadow-md: 0 8px 20px rgba(11, 26, 58, 0.08);
-  --shadow-lg: 0 12px 30px rgba(11, 26, 58, 0.12);
+  --shadow-sm: 0 2px 6px rgba(11, 26, 58, 0.03), 0 8px 16px -6px rgba(11, 26, 58, 0.04);
+  --shadow-md: 0 10px 20px -5px rgba(11, 26, 58, 0.08), 0 6px 12px -6px rgba(11, 26, 58, 0.03);
+  --shadow-lg: 0 20px 35px -8px rgba(11, 26, 58, 0.12), 0 10px 20px -8px rgba(11, 26, 58, 0.06);
   
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -223,10 +223,12 @@ button, input {
 
 .btn-primary:hover {
   background-color: var(--accent-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(197, 160, 67, 0.3);
 }
 
 .btn-primary:active {
-  transform: translateY(1px);
+  transform: translateY(0) scale(0.98);
   background-color: var(--accent-dark);
 }
 
@@ -238,9 +240,12 @@ button, input {
 
 .btn-secondary:hover {
   background-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(11, 26, 58, 0.2);
 }
 
 .btn-secondary:active {
+  transform: translateY(0) scale(0.98);
   background-color: var(--primary-dark);
 }
 
@@ -249,7 +254,7 @@ button, input {
    ========================================================================== */
 
 .welcome-banner {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 60%, var(--primary-dark) 100%);
   border-radius: var(--border-radius-md);
   padding: 24px 20px;
   color: var(--text-white);
@@ -258,16 +263,31 @@ button, input {
   overflow: hidden;
   box-shadow: var(--shadow-md);
   border-bottom: 3px solid var(--accent-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .welcome-banner::after {
   content: "";
   position: absolute;
-  top: -20%;
-  right: -10%;
-  width: 150px;
-  height: 150px;
-  background: rgba(255, 255, 255, 0.03);
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.welcome-banner::before {
+  content: "";
+  position: absolute;
+  bottom: -50px;
+  left: -20px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(197, 160, 67, 0.05) 0%, rgba(197, 160, 67, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -372,21 +392,39 @@ button, input {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.action-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--accent-color);
+  transform: scaleX(0);
+  transition: transform var(--transition-normal);
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
 }
 
 .action-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-md);
   border-color: var(--accent-light);
 }
 
+.action-card:hover::after {
+  transform: scaleX(1);
+}
+
 .action-card:active {
-  transform: translateY(0);
+  transform: translateY(-1px);
 }
 
 .action-icon {
-  background-color: rgba(11, 26, 58, 0.05);
+  background-color: rgba(11, 26, 58, 0.04);
   color: var(--primary-color);
   width: 36px;
   height: 36px;
@@ -401,6 +439,7 @@ button, input {
 .action-card:hover .action-icon {
   background-color: var(--primary-color);
   color: var(--text-white);
+  transform: scale(1.08);
 }
 
 .action-icon svg {
@@ -576,15 +615,18 @@ button, input {
   background-color: var(--card-bg);
   border-radius: var(--border-radius-md);
   border: 1px solid var(--border-color);
+  border-left: 4px solid transparent; /* Elegant left border accent */
   margin-bottom: 12px;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
 }
 
 .household-card:hover {
-  border-color: var(--accent-light);
+  border-color: var(--border-color);
+  border-left-color: var(--accent-color);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .household-header {
@@ -613,13 +655,33 @@ button, input {
 }
 
 .status-badge {
-  background-color: rgba(16, 185, 129, 0.1);
+  background-color: rgba(16, 185, 129, 0.08);
   color: var(--success-color);
   font-size: 11px;
   font-weight: 700;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 20px;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--success-color);
+  box-shadow: 0 0 6px var(--success-color);
+  animation: pulseStatus 2s infinite;
+}
+
+@keyframes pulseStatus {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 10px var(--success-color); }
+  100% { transform: scale(1); opacity: 0.8; }
 }
 
 .household-body {
@@ -648,9 +710,18 @@ button, input {
 }
 
 .member-bullet {
-  color: var(--accent-color);
-  font-weight: 700;
-  font-size: 13px;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 12px;
+  background-color: rgba(11, 26, 58, 0.05);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Outfit', sans-serif;
 }
 
 .member-name {
@@ -752,6 +823,11 @@ button, input {
   height: 100%;
   object-fit: cover; /* Crop and fill container */
   display: block;
+  transition: transform var(--transition-normal);
+}
+
+.process-step-card:hover .step-image {
+  transform: scale(1.08);
 }
 
 .step-number-badge {
@@ -969,6 +1045,13 @@ button, input {
   border-radius: var(--border-radius-md);
   padding: 18px;
   box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.info-section-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-light);
 }
 
 .info-section-card h3 {
@@ -978,6 +1061,13 @@ button, input {
   border-bottom: 2px solid rgba(197, 160, 67, 0.2);
   padding-bottom: 6px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.info-card-icon {
+  flex-shrink: 0;
 }
 
 .info-section-card p {
