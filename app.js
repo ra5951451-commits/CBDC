@@ -4469,24 +4469,311 @@ function toggleBeneficiaryStatus(srNo) {
   renderAdminDashboard();
 }
 
-function exportUpdatedJSON() {
-  const exportData = {
-    metadata: {
-      ...appData.metadata,
-      exported_at: new Date().toISOString()
-    },
-    beneficiaries: appData.beneficiaries
-  };
+/* ==========================================================================
+   Talati Custom PDF & Excel/Google Sheet Export Hub Engine
+   ========================================================================== */
 
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
-  const downloadAnchor = document.createElement('a');
-  downloadAnchor.setAttribute("href", dataStr);
-  downloadAnchor.setAttribute("download", `CBDC_Updated_Data_${new Date().toISOString().slice(0,10)}.json`);
-  document.body.appendChild(downloadAnchor);
-  downloadAnchor.click();
-  downloadAnchor.remove();
+let currentExportFormat = 'PDF';
 
-  showToast("📥 અપડેટેડ ડેટા JSON ફાઈલ ડાઉનલોડ થઈ!");
+function openExportModal() {
+  const modal = document.getElementById('export-options-modal');
+  if (!modal) return;
+
+  // Calculate live filter counts
+  const allCount = appData.beneficiaries ? appData.beneficiaries.length : 0;
+  const pendingCount = appData.beneficiaries ? appData.beneficiaries.filter(b => b.onboarded !== 'Yes').length : 0;
+  const onboardedCount = appData.beneficiaries ? appData.beneficiaries.filter(b => b.onboarded === 'Yes').length : 0;
+
+  // Shared Mobiles Count
+  const mobGroup = {};
+  if (appData.beneficiaries) {
+    appData.beneficiaries.forEach(b => {
+      const mob = b.clean_mobile || b.mobile;
+      if (mob) {
+        mobGroup[mob] = (mobGroup[mob] || 0) + 1;
+      }
+    });
+  }
+  const sharedMobCount = appData.beneficiaries ? appData.beneficiaries.filter(b => {
+    const mob = b.clean_mobile || b.mobile;
+    return mob && mobGroup[mob] > 1;
+  }).length : 0;
+
+  // Shared Cards Count (Households with >= 2 members)
+  const multiMemberCards = new Set();
+  if (appData.households) {
+    appData.households.forEach(h => {
+      if (h.members && h.members.length >= 2) {
+        multiMemberCards.add(h.ration_card);
+      }
+    });
+  }
+  const sharedCardCount = appData.beneficiaries ? appData.beneficiaries.filter(b => multiMemberCards.has(b.ration_card)).length : 0;
+
+  // Update counts in DOM
+  const elAll = document.getElementById('exp-count-all');
+  const elPend = document.getElementById('exp-count-pending');
+  const elOnb = document.getElementById('exp-count-onboarded');
+  const elMob = document.getElementById('exp-count-shared-mob');
+  const elCard = document.getElementById('exp-count-shared-card');
+
+  if (elAll) elAll.textContent = allCount;
+  if (elPend) elPend.textContent = pendingCount;
+  if (elOnb) elOnb.textContent = onboardedCount;
+  if (elMob) elMob.textContent = sharedMobCount;
+  if (elCard) elCard.textContent = sharedCardCount;
+
+  updateExportModalPreview();
+  modal.classList.add('open');
+}
+
+function closeExportModal() {
+  const modal = document.getElementById('export-options-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function selectExportFormat(format) {
+  currentExportFormat = format;
+  const btnPdf = document.getElementById('format-btn-pdf');
+  const btnSheet = document.getElementById('format-btn-sheet');
+
+  if (format === 'PDF') {
+    if (btnPdf) btnPdf.classList.add('active');
+    if (btnSheet) btnSheet.classList.remove('active');
+  } else {
+    if (btnPdf) btnPdf.classList.remove('active');
+    if (btnSheet) btnSheet.classList.add('active');
+  }
+
+  updateExportModalPreview();
+}
+
+function getExportFilteredData(filterType) {
+  if (!appData.beneficiaries) return [];
+
+  if (filterType === 'PENDING') {
+    return appData.beneficiaries.filter(b => b.onboarded !== 'Yes');
+  } else if (filterType === 'ONBOARDED') {
+    return appData.beneficiaries.filter(b => b.onboarded === 'Yes');
+  } else if (filterType === 'SHARED_MOBILE') {
+    const mobGroup = {};
+    appData.beneficiaries.forEach(b => {
+      const mob = b.clean_mobile || b.mobile;
+      if (mob) mobGroup[mob] = (mobGroup[mob] || 0) + 1;
+    });
+    return appData.beneficiaries.filter(b => {
+      const mob = b.clean_mobile || b.mobile;
+      return mob && mobGroup[mob] > 1;
+    });
+  } else if (filterType === 'SHARED_CARD') {
+    const multiMemberCards = new Set();
+    if (appData.households) {
+      appData.households.forEach(h => {
+        if (h.members && h.members.length >= 2) multiMemberCards.add(h.ration_card);
+      });
+    }
+    return appData.beneficiaries.filter(b => multiMemberCards.has(b.ration_card));
+  }
+  
+  return appData.beneficiaries;
+}
+
+function updateExportModalPreview() {
+  const checkedRadio = document.querySelector('input[name="exportDataFilter"]:checked');
+  const filterVal = checkedRadio ? checkedRadio.value : 'ALL';
+  const data = getExportFilteredData(filterVal);
+  const previewBar = document.getElementById('export-preview-bar');
+
+  const fmtName = currentExportFormat === 'PDF' ? 'PDF Document' : 'Excel / Google Sheet';
+
+  if (previewBar) {
+    previewBar.innerHTML = `📊 કુલ <strong>${data.length} સભ્યો</strong> ડાઉનલોડ કરવા માટે તૈયાર છે (${fmtName})`;
+  }
+}
+
+function executeExportDownload() {
+  const checkedRadio = document.querySelector('input[name="exportDataFilter"]:checked');
+  const filterVal = checkedRadio ? checkedRadio.value : 'ALL';
+  const data = getExportFilteredData(filterVal);
+
+  if (data.length === 0) {
+    showToast("⚠️ પસંદ કરેલ કેટેગરી માટે કોઈ ડેટા મળ્યો નથી.");
+    return;
+  }
+
+  if (currentExportFormat === 'PDF') {
+    generatePDFExport(data, filterVal);
+  } else {
+    generateExcelExport(data, filterVal);
+  }
+
+  closeExportModal();
+}
+
+function generateExcelExport(data, filterType) {
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const fileName = `Pali_CBDC_${filterType}_${dateStr}.xlsx`;
+
+  // Standardize record rows for Excel
+  const excelRows = data.map((b, idx) => ({
+    "ક્રમ (Sr)": idx + 1,
+    "લાભાર્થીનું નામ (Name)": b.name,
+    "રેશન કાર્ડ નંબર (Ration Card)": b.ration_card,
+    "કાર્ડ પ્રકાર (Card Type)": b.card_type || '-',
+    "મોબાઈલ નંબર (Mobile)": b.mobile || '-',
+    "ઓનબોર્ડિંગ સ્થિતિ (Status)": b.onboarded === 'Yes' ? 'ઓનબોર્ડેડ (Done)' : 'પેન્ડિંગ (Pending)'
+  }));
+
+  if (window.XLSX) {
+    const worksheet = XLSX.utils.json_to_sheet(excelRows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "CBDC Report");
+
+    // Auto-fit column widths
+    const max_width = excelRows.reduce((w, r) => {
+      return [
+        Math.max(w[0], String(r["ક્રમ (Sr)"]).length),
+        Math.max(w[1], String(r["લાભાર્થીનું નામ (Name)"]).length),
+        Math.max(w[2], String(r["રેશન કાર્ડ નંબર (Ration Card)"]).length),
+        Math.max(w[3], String(r["કાર્ડ પ્રકાર (Card Type)"]).length),
+        Math.max(w[4], String(r["મોબાઈલ નંબર (Mobile)"]).length),
+        Math.max(w[5], String(r["ઓનબોર્ડિંગ સ્થિતિ (Status)"]).length)
+      ];
+    }, [10, 25, 20, 12, 15, 18]);
+
+    worksheet['!cols'] = max_width.map(w => ({ wch: w + 2 }));
+
+    XLSX.writeFile(workbook, fileName);
+    showToast(`📊 Excel/Sheet અહેવાલ ડાઉનલોડ થયો! (${data.length} સભ્યો)`);
+  } else {
+    // UTF-8 BOM CSV Fallback for Excel / Google Sheets
+    let csvContent = "\uFEFFક્રમ,લાભાર્થીનું નામ,રેશન કાર્ડ નંબર,કાર્ડ પ્રકાર,મોબાઈલ નંબર,સ્થિતિ\n";
+    excelRows.forEach(r => {
+      csvContent += `"${r["ક્રમ (Sr)"]}","${r["લાભાર્થીનું નામ (Name)"]}","${r["રેશન કાર્ડ નંબર (Ration Card)"]}","${r["કાર્ડ પ્રકાર (Card Type)"]}","${r["મોબાઈલ નંબર (Mobile)"]}","${r["ઓનબોર્ડિંગ સ્થિતિ (Status)"]}"\n`;
+    });
+
+    const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Pali_CBDC_${filterType}_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    showToast(`📊 Sheet/CSV અહેવાલ ડાઉનલોડ થયો! (${data.length} સભ્યો)`);
+  }
+}
+
+function generatePDFExport(data, filterType) {
+  const dateStr = new Date().toLocaleDateString('gu-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const timeStr = new Date().toLocaleTimeString('gu-IN', { hour: '2-digit', minute: '2-digit' });
+
+  let filterLabel = "બધા લાભાર્થીઓ";
+  if (filterType === 'PENDING') filterLabel = "પેન્ડિંગ લાભાર્થીઓ";
+  if (filterType === 'ONBOARDED') filterLabel = "ઓનબોર્ડેડ લાભાર્થીઓ";
+  if (filterType === 'SHARED_MOBILE') filterLabel = "શેર્ડ મોબાઈલ ધરાવતા સભ્યો";
+  if (filterType === 'SHARED_CARD') filterLabel = "શેર્ડ રેશનકાર્ડ ધરાવતા સભ્યો";
+
+  let tableRowsHtml = "";
+  data.forEach((b, idx) => {
+    const statusBadge = b.onboarded === 'Yes' 
+      ? '<span style="color:#059669; font-weight:bold;">✓ ઓનબોર્ડ</span>' 
+      : '<span style="color:#dc2626; font-weight:bold;">⏳ પેન્ડિંગ</span>';
+
+    tableRowsHtml += `
+      <tr style="border-bottom: 1px solid #e2e8f0; ${idx % 2 === 1 ? 'background-color: #f8fafc;' : ''}">
+        <td style="padding: 8px 10px; text-align: center;">${idx + 1}</td>
+        <td style="padding: 8px 10px; font-weight: 600;">${b.name}</td>
+        <td style="padding: 8px 10px; font-family: monospace;">${b.ration_card}</td>
+        <td style="padding: 8px 10px; text-align: center;">${b.card_type || '-'}</td>
+        <td style="padding: 8px 10px; text-align: center;">${b.mobile || '-'}</td>
+        <td style="padding: 8px 10px; text-align: center;">${statusBadge}</td>
+      </tr>
+    `;
+  });
+
+  const pdfContainer = document.createElement('div');
+  pdfContainer.id = 'pdf-export-container';
+  pdfContainer.style.padding = '24px';
+  pdfContainer.style.fontFamily = "'Outfit', 'Noto Sans Gujarati', sans-serif";
+  pdfContainer.style.color = '#0b1a3a';
+
+  pdfContainer.innerHTML = `
+    <div style="border-bottom: 3px double #0b1a3a; padding-bottom: 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2 style="margin: 0; font-size: 20px; color: #0b1a3a;">🏛️ પળી ગ્રામ પંચાયત કાર્યાલય</h2>
+        <p style="margin: 4px 0 0 0; font-size: 13px; color: #475569;">તા. ઊંઝા, જી. મહેસાણા — CBDC e₹ રેશન વિતરણ સત્તાવાર અહેવાલ</p>
+      </div>
+      <div style="text-align: right; font-size: 12px; color: #64748b;">
+        <div><strong>તારીખ:</strong> ${dateStr} ${timeStr}</div>
+        <div><strong>રિપોર્ટ:</strong> ${filterLabel}</div>
+        <div><strong>કુલ નોંધણી:</strong> ${data.length}</div>
+      </div>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px;">
+      <thead>
+        <tr style="background-color: #0b1a3a; color: #ffffff;">
+          <th style="padding: 10px; border: 1px solid #0b1a3a; width: 40px;">#</th>
+          <th style="padding: 10px; border: 1px solid #0b1a3a; text-align: left;">👤 લાભાર્થીનું નામ</th>
+          <th style="padding: 10px; border: 1px solid #0b1a3a; text-align: left;">🪪 રેશન કાર્ડ નંબર</th>
+          <th style="padding: 10px; border: 1px solid #0b1a3a; text-align: center;">🏷️ પ્રકાર</th>
+          <th style="padding: 10px; border: 1px solid #0b1a3a; text-align: center;">📱 મોબાઈલ</th>
+          <th style="padding: 10px; border: 1px solid #0b1a3a; text-align: center;">📌 સ્થિતિ</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRowsHtml}
+      </tbody>
+    </table>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 32px; pt-16px; border-top: 1px dashed #cbd5e1; font-size: 12px;">
+      <div>
+        <p style="margin: 0; color: #64748b;">દુકાન: ભરતભાઈ હરગોવનજી બારોટ (૨૩૧૦)</p>
+        <p style="margin: 2px 0 0 0; color: #64748b;">સ્થળ: પળી (૧૪૭૮૫)</p>
+      </div>
+      <div style="text-align: center;">
+        <div style="height: 40px;"></div>
+        <p style="margin: 0; font-weight: bold; border-top: 1px solid #0b1a3a; padding-top: 4px; width: 160px;">તલાટી મંત્રી સહી / સિક્કો</p>
+      </div>
+    </div>
+  `;
+
+  if (window.html2pdf) {
+    const opt = {
+      margin:       [0.4, 0.4, 0.4, 0.4],
+      filename:     `Pali_CBDC_${filterType}_${new Date().toISOString().slice(0,10)}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(pdfContainer).save().then(() => {
+      showToast(`📄 PDF અહેવાલ ડાઉનલોડ થયો! (${data.length} સભ્યો)`);
+    });
+  } else {
+    // Fallback: Open formatted print view window
+    const printWin = window.open('', '_blank');
+    printWin.document.write(`
+      <html>
+        <head>
+          <title>પળી ગ્રામ પંચાયત - CBDC અહેવાલ</title>
+          <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;600;700&display=swap" rel="stylesheet">
+          <style>
+            body { font-family: 'Noto Sans Gujarati', sans-serif; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #cbd5e1; padding: 8px; font-size: 12px; }
+            th { background: #0b1a3a; color: white; }
+          </style>
+        </head>
+        <body>
+          ${pdfContainer.innerHTML}
+          <script>window.onload = function() { window.print(); }</script>
+        </body>
+      </html>
+    `);
+    printWin.document.close();
+    showToast(`📄 પ્રિન્ટ / PDF ડાઉનલોડ વિન્ડો ઓપન થઈ!`);
+  }
 }
 
 function showToast(msg) {

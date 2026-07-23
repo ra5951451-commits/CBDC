@@ -2913,3 +2913,206 @@ input:checked + .toggle-slider:before {
   }
 }
 
+/* ==========================================================================
+   Talati Custom Export Options Hub Modal Styles
+   ========================================================================== */
+
+.export-modal-card {
+  position: relative;
+  width: 90%;
+  max-width: 520px;
+  max-height: 90vh;
+  background: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 24px 48px -12px rgba(11, 26, 58, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10002;
+  animation: loginCardSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.export-modal-header {
+  padding: 18px 22px;
+  background: var(--primary-color);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.export-modal-header h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.export-modal-header .lightbox-close-btn {
+  color: #ffffff;
+  position: relative;
+  top: 0;
+  right: 0;
+  opacity: 0.85;
+}
+
+.export-modal-header .lightbox-close-btn:hover {
+  opacity: 1;
+}
+
+.export-modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.export-section-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.export-filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.export-radio-item {
+  position: relative;
+  cursor: pointer;
+}
+
+.export-radio-item input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.export-radio-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 15px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-color);
+  transition: all 0.2s ease;
+}
+
+.export-radio-item input[type="radio"]:checked + .export-radio-box {
+  border-color: var(--primary-color);
+  background: rgba(11, 26, 58, 0.04);
+  box-shadow: 0 0 0 3px rgba(11, 26, 58, 0.08);
+}
+
+.export-radio-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.export-radio-count {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--border-color);
+  color: var(--primary-color);
+}
+
+.export-radio-item input[type="radio"]:checked + .export-radio-box .export-radio-count {
+  background: var(--primary-color);
+  color: #ffffff;
+}
+
+.export-format-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.export-format-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background: var(--bg-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.export-format-btn:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.export-format-btn.active {
+  border-color: var(--primary-color);
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(11, 26, 58, 0.12);
+}
+
+.export-format-btn .format-icon {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.export-format-btn .format-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.export-format-btn .format-desc {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.export-preview-bar {
+  padding: 12px 14px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--border-radius-sm);
+  font-size: 12.5px;
+  color: #166534;
+  text-align: center;
+}
+
+.export-modal-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .export-modal-card {
+    width: 94%;
+    margin: 10px;
+  }
+
+  .export-format-options {
+    grid-template-columns: 1fr;
+  }
+
+  .export-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .export-modal-footer button {
+    width: 100%;
+    justify-content: center;
+  }
+}

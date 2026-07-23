@@ -13,6 +13,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- SheetJS & html2pdf CDN for PDF and Excel/Google Sheet Exporting -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
@@ -450,7 +454,7 @@
             <span class="last-sync-time" id="admin-last-sync">🟢 લાઈવ</span>
           </div>
           <div class="admin-actions-right">
-            <button id="admin-export-json-btn" class="btn btn-primary btn-sm">📥 ડાઉનલોડ</button>
+            <button id="admin-export-json-btn" class="btn btn-primary btn-sm" onclick="openExportModal()">📥 ડાઉનલોડ</button>
             <button id="admin-logout-btn" class="btn btn-secondary btn-sm">🚪 બહાર</button>
           </div>
         </div>
@@ -620,9 +624,9 @@
           </div>
 
           <div class="report-export-box card" style="padding: 24px; text-align: center;">
-            <h4>📥 ડેટા ડાઉનલોડ</h4>
-            <p style="font-size: 13px; color: var(--text-light); margin: 8px 0 16px 0;">લાઈવ JSON ડેટા ફાઈલ</p>
-            <button onclick="exportUpdatedJSON()" class="btn btn-primary">📥 ડાઉનલોડ JSON</button>
+            <h4>📥 ડેટા ડાઉનલોડ કેન્દ્ર</h4>
+            <p style="font-size: 13px; color: var(--text-light); margin: 8px 0 16px 0;">PDF અહેવાલ અથવા Excel/Google Sheet ડાઉનલોડ કરો</p>
+            <button onclick="openExportModal()" class="btn btn-primary">📥 ડાઉનલોડ અહેવાલ (PDF / Sheet)</button>
           </div>
         </div>
 
@@ -638,6 +642,92 @@
       <button class="lightbox-close-btn" id="lightbox-close-btn" aria-label="બંધ કરો">&times;</button>
       <div class="lightbox-title-bar" id="lightbox-caption">સ્ટેપ સ્ક્રીનશોટ</div>
       <img id="lightbox-img" src="" alt="મોટું ચિત્ર" class="lightbox-img">
+    </div>
+  </div>
+
+  <!-- Talati Custom Export Options Hub Modal -->
+  <div id="export-options-modal" class="lightbox-modal">
+    <div class="lightbox-overlay" onclick="closeExportModal()"></div>
+    <div class="export-modal-card">
+      <div class="export-modal-header">
+        <h3>📥 અહેવાલ ડાઉનલોડ કેન્દ્ર (Export Hub)</h3>
+        <button class="lightbox-close-btn" onclick="closeExportModal()">&times;</button>
+      </div>
+
+      <div class="export-modal-body">
+        <!-- Step 1: Select Filter Data -->
+        <div class="export-section">
+          <label class="export-section-title">૧. કયો ડેટા ડાઉનલોડ કરવો છે? (Select Dataset)</label>
+          <div class="export-filter-options">
+            <label class="export-radio-item">
+              <input type="radio" name="exportDataFilter" value="ALL" checked onchange="updateExportModalPreview()">
+              <span class="export-radio-box">
+                <span class="export-radio-label">📋 બધા સભ્યો (All)</span>
+                <span class="export-radio-count" id="exp-count-all">270</span>
+              </span>
+            </label>
+
+            <label class="export-radio-item">
+              <input type="radio" name="exportDataFilter" value="PENDING" onchange="updateExportModalPreview()">
+              <span class="export-radio-box">
+                <span class="export-radio-label">⏳ પેન્ડિંગ (Pending)</span>
+                <span class="export-radio-count" id="exp-count-pending">--</span>
+              </span>
+            </label>
+
+            <label class="export-radio-item">
+              <input type="radio" name="exportDataFilter" value="ONBOARDED" onchange="updateExportModalPreview()">
+              <span class="export-radio-box">
+                <span class="export-radio-label">✅ ઓનબોર્ડેડ (Done)</span>
+                <span class="export-radio-count" id="exp-count-onboarded">--</span>
+              </span>
+            </label>
+
+            <label class="export-radio-item">
+              <input type="radio" name="exportDataFilter" value="SHARED_MOBILE" onchange="updateExportModalPreview()">
+              <span class="export-radio-box">
+                <span class="export-radio-label">📱 શેર્ડ મોબાઈલ સભ્યો</span>
+                <span class="export-radio-count" id="exp-count-shared-mob">--</span>
+              </span>
+            </label>
+
+            <label class="export-radio-item">
+              <input type="radio" name="exportDataFilter" value="SHARED_CARD" onchange="updateExportModalPreview()">
+              <span class="export-radio-box">
+                <span class="export-radio-label">🔗 શેર્ડ રેશનકાર્ડ સભ્યો</span>
+                <span class="export-radio-count" id="exp-count-shared-card">--</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Step 2: Select Format -->
+        <div class="export-section">
+          <label class="export-section-title">૨. ફોર્મેટ પસંદ કરો (Export Format)</label>
+          <div class="export-format-options">
+            <button type="button" class="export-format-btn active" id="format-btn-pdf" onclick="selectExportFormat('PDF')">
+              <span class="format-icon">📄</span>
+              <span class="format-name">PDF Document</span>
+              <span class="format-desc">પ્રિન્ટ / અહેવાલ PDF</span>
+            </button>
+            <button type="button" class="export-format-btn" id="format-btn-sheet" onclick="selectExportFormat('SHEET')">
+              <span class="format-icon">📊</span>
+              <span class="format-name">Excel / Sheet</span>
+              <span class="format-desc">માઇક્રોસોફ્ટ એક્સેલ / ગૂગલ શીટ</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Export Summary Preview Badge -->
+        <div class="export-preview-bar" id="export-preview-bar">
+          📊 કુલ <strong>270 સભ્યો</strong> ડાઉનલોડ કરવા માટે તૈયાર છે (PDF format)
+        </div>
+      </div>
+
+      <div class="export-modal-footer">
+        <button class="btn btn-secondary" onclick="closeExportModal()">રદ કરો</button>
+        <button class="btn btn-primary" onclick="executeExportDownload()">📥 ડાઉનલોડ અહેવાલ</button>
+      </div>
     </div>
   </div>
 
