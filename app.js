@@ -24,7 +24,8 @@ let filterState = {
 
 let adminState = {
   isAuthenticated: false,
-  passcode: "1234",
+  username: "nikunjdarji",
+  password: "Nikunj@97",
   searchQuery: "",
   filterStatus: "ALL",
   onboardingOverrides: {}
@@ -356,7 +357,8 @@ if (filterPillsContainer) {
    ========================================================================== */
 
 function initAdminAuth() {
-  const pinInput = document.getElementById('admin-pin-input');
+  const userInput = document.getElementById('admin-username-input');
+  const passInput = document.getElementById('admin-password-input');
   const loginBtn = document.getElementById('admin-login-btn');
   const pinError = document.getElementById('admin-pin-error');
   const authCard = document.getElementById('admin-auth-card');
@@ -365,13 +367,17 @@ function initAdminAuth() {
   const exportBtn = document.getElementById('admin-export-json-btn');
 
   const attemptLogin = () => {
-    if (pinInput.value === adminState.passcode) {
+    const u = userInput ? userInput.value.trim() : '';
+    const p = passInput ? passInput.value : '';
+
+    if (u === adminState.username && p === adminState.password) {
       adminState.isAuthenticated = true;
       authCard.style.display = 'none';
       dashWrapper.style.display = 'block';
       pinError.style.display = 'none';
-      pinInput.value = '';
-      showToast("🔓 એડમિન લૉગિન સફળ થયું!");
+      if (userInput) userInput.value = '';
+      if (passInput) passInput.value = '';
+      showToast("🔓 સ્વાગત છે nikunjdarji! એડમિન લૉગિન સફળ થયું.");
       renderAdminDashboard();
     } else {
       pinError.style.display = 'block';
@@ -379,7 +385,8 @@ function initAdminAuth() {
   };
 
   if (loginBtn) loginBtn.addEventListener('click', attemptLogin);
-  if (pinInput) pinInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
+  if (userInput) userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
+  if (passInput) passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
 
   if (logoutBtn) logoutBtn.addEventListener('click', () => {
     adminState.isAuthenticated = false;

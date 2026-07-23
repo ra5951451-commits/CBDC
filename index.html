@@ -34,7 +34,10 @@
         <button class="nav-item" data-tab="list-tab">પાત્ર યાદી</button>
         <button class="nav-item" data-tab="process-tab">CBDC કરવાના સ્ટેપ</button>
         <button class="nav-item" data-tab="info-tab">યોજના વિશે માહિતી</button>
-        <button class="nav-item admin-nav-btn" data-tab="admin-tab">🔒 એડમિન પેનલ</button>
+        <button class="nav-item admin-nav-btn" data-tab="admin-tab">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon-inline" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: text-bottom;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          એડમિન
+        </button>
       </nav>
     </div>
   </header>
@@ -420,14 +423,21 @@
 
       <!-- Admin Passcode Login Modal / Lock View -->
       <div id="admin-auth-card" class="card admin-auth-card">
-        <div class="admin-auth-icon">🔐</div>
-        <h3>એડમિન લૉગિન જરૂરી છે</h3>
-        <p>સંચાલન પેનલમાં પ્રવેશવા માટે પંચાયત એડમિન પાસકોડ દાખલ કરો (ડિફોલ્ટ PIN: <strong>1234</strong>)</p>
-        <div class="admin-pin-form">
-          <input type="password" id="admin-pin-input" maxlength="6" placeholder="PIN દાખલ કરો..." aria-label="એડમિન પિન">
-          <button id="admin-login-btn" class="btn btn-primary">પ્રવેશ કરો</button>
+        <div class="admin-auth-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width: 52px; height: 52px; color: var(--primary-color);"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <p id="admin-pin-error" class="admin-pin-error" style="display: none;">❌ ખોટો PIN! કૃપા કરીને સાચો PIN દાખલ કરો.</p>
+        <h3>એડમિન લૉગિન (Admin Login)</h3>
+        <p>સંચાલન પેનલમાં પ્રવેશવા માટે તમારું એડમિન આઈડી અને પાસવર્ડ દાખલ કરો.</p>
+        <div class="admin-login-form">
+          <div class="input-group">
+            <input type="text" id="admin-username-input" placeholder="એડમિન આઈડી (ID)..." aria-label="એડમિન આઈડી">
+          </div>
+          <div class="input-group">
+            <input type="password" id="admin-password-input" placeholder="પાસવર્ડ (Password)..." aria-label="પાસવર્ડ">
+          </div>
+          <button id="admin-login-btn" class="btn btn-primary" style="width: 100%; margin-top: 6px;">પ્રવેશ કરો (Login)</button>
+        </div>
+        <p id="admin-pin-error" class="admin-pin-error" style="display: none;">❌ ખોટો એડમિન આઈડી અથવા પાસવર્ડ!</p>
       </div>
 
       <!-- Admin Main Dashboard Content (Hidden until unlocked) -->
@@ -607,7 +617,7 @@
 
       <!-- Nav Admin -->
       <button class="nav-item admin-nav-btn" data-tab="admin-tab">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="nav-icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="nav-icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         <span class="nav-label">એડમિન</span>
       </button>
 

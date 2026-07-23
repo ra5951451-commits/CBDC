@@ -1900,23 +1900,29 @@ button, input {
   margin-bottom: 20px;
 }
 
-.admin-pin-form {
+.admin-login-form {
   display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 12px;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 280px;
+  margin: 0 auto 12px auto;
 }
 
-.admin-pin-form input {
-  width: 160px;
+.admin-login-form input {
+  width: 100%;
   padding: 10px 14px;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-md);
-  font-family: 'Outfit', sans-serif;
-  font-size: 18px;
-  letter-spacing: 4px;
-  text-align: center;
+  font-family: 'Outfit', 'Noto Sans Gujarati', sans-serif;
+  font-size: 14px;
   background: var(--bg-color);
+  box-sizing: border-box;
+}
+
+.admin-login-form input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
 }
 
 .admin-pin-error {
