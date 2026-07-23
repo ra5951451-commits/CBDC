@@ -17,6 +17,7 @@ let appData = {
 
 let filterState = {
   query: "",
+  selectedCategory: "ALL",
   filteredHouseholds: [],
   displayedCount: 15
 };
@@ -48,10 +49,8 @@ const tabHashMapping = {
 };
 
 function initRouter() {
-  // Listen for hash changes
   window.addEventListener('hashchange', handleRoute);
   
-  // Set default route if none exists
   if (!window.location.hash || !tabHashMapping[window.location.hash]) {
     window.location.hash = '#home';
   } else {
@@ -67,16 +66,13 @@ function handleRoute() {
 }
 
 function switchTab(tabId) {
-  // Hide all tabs
   tabs.forEach(tab => tab.classList.remove('active'));
   
-  // Show active tab
   const activeTab = document.getElementById(tabId);
   if (activeTab) {
     activeTab.classList.add('active');
   }
   
-  // Update navbar items active state
   navItems.forEach(item => {
     if (item.getAttribute('data-tab') === tabId) {
       item.classList.add('active');
@@ -85,11 +81,9 @@ function switchTab(tabId) {
     }
   });
 
-  // Scroll to top of body on page change
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-// Bind Navigation Clicks
 navItems.forEach(item => {
   item.addEventListener('click', () => {
     const tabId = item.getAttribute('data-tab');
@@ -100,7 +94,6 @@ navItems.forEach(item => {
   });
 });
 
-// Home Page Grid Actions Navigation
 document.getElementById('action-go-to-list').addEventListener('click', () => {
   window.location.hash = '#list';
 });
@@ -165,34 +158,42 @@ async function loadData() {
 }
 
 /* ==========================================================================
-   3. Search & Highlighting Logic
+   3. Search & Highlighting & Filtering Logic
    ========================================================================== */
 
-function performSearch(queryText) {
-  filterState.query = queryText.trim().toUpperCase();
-  
-  if (filterState.query === "") {
-    filterState.filteredHouseholds = [...appData.households];
-    clearSearchBtn.style.display = 'none';
-  } else {
+function performSearch(queryText, category) {
+  if (queryText !== undefined) filterState.query = queryText.trim().toUpperCase();
+  if (category !== undefined) filterState.selectedCategory = category;
+
+  let result = appData.households;
+
+  // Category filter
+  if (filterState.selectedCategory !== "ALL") {
+    result = result.filter(h => {
+      const type = h.members[0] && h.members[0].card_type ? h.members[0].card_type.toUpperCase() : '';
+      if (filterState.selectedCategory === "ONBOARDED") {
+        return h.members.some(m => m.onboarded === "Yes");
+      }
+      return type === filterState.selectedCategory;
+    });
+  }
+
+  // Text search query
+  if (filterState.query !== "") {
     clearSearchBtn.style.display = 'block';
-    
-    // Match either the ration card number or ANY member's name
-    filterState.filteredHouseholds = appData.households.filter(household => {
-      // 1. Match ration card (removing spaces for flexibility)
-      const cleanQuery = filterState.query.replace(/\s+/g, '');
+    const cleanQuery = filterState.query.replace(/\s+/g, '');
+    result = result.filter(household => {
       const cardMatch = household.clean_ration_card.includes(cleanQuery) || household.ration_card.includes(filterState.query);
-      
-      // 2. Match family member names
       const nameMatch = household.members.some(member => 
         member.name.toUpperCase().includes(filterState.query)
       );
-      
       return cardMatch || nameMatch;
     });
+  } else {
+    clearSearchBtn.style.display = 'none';
   }
-  
-  // Reset pagination on new search
+
+  filterState.filteredHouseholds = result;
   filterState.displayedCount = 15;
   renderStats();
   renderList();
@@ -200,19 +201,27 @@ function performSearch(queryText) {
 
 function renderStats() {
   resultsCount.textContent = `કુલ રેશન કાર્ડ: ${filterState.filteredHouseholds.length}`;
+  
+  // Home tab live stats
+  const homeBeneficiaries = document.getElementById('home-stat-beneficiaries');
+  const homeHouseholds = document.getElementById('home-stat-households');
+  const homeShop = document.getElementById('home-stat-shop');
+  const homeDate = document.getElementById('home-stat-date');
+
+  if (homeBeneficiaries && appData.beneficiaries.length > 0) homeBeneficiaries.textContent = appData.beneficiaries.length;
+  if (homeHouseholds && appData.households.length > 0) homeHouseholds.textContent = appData.households.length;
+  if (homeShop) homeShop.textContent = "ભરતભાઈ બારોટ";
+  if (homeDate && appData.metadata.generated_on) homeDate.textContent = appData.metadata.generated_on.split(' ')[0];
 }
 
-// Highlight helper (safe from HTML injection, case-insensitive match)
 function highlightMatch(text, query) {
   if (!query) return text;
   
-  // Escape HTML entities to prevent scripting injection
   const escapedText = text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
   
-  // Clean up special regex characters in search query
   const escapedQuery = query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   const regex = new RegExp(`(${escapedQuery})`, 'gi');
   
@@ -231,7 +240,7 @@ function renderList() {
       <div class="empty-state">
         <span class="empty-state-icon">🔍</span>
         <h4>કોઈ પરિણામ મળ્યું નથી</h4>
-        <p>"${filterState.query}" માટે કોઈ પાત્ર રેશન કાર્ડ મળ્યું નથી. કૃપા કરીને નામ અથવા રેશનકાર્ડ નંબર ફરીથી તપાસો.</p>
+        <p>"${filterState.query}" અથવા પસંદ કરેલ ફિર્લ્ટર માટે કોઈ રેશન કાર્ડ મળ્યું નથી.</p>
       </div>
     `;
     loadMoreContainer.style.display = 'none';
@@ -244,22 +253,26 @@ function renderList() {
     const cardEl = document.createElement('div');
     cardEl.className = 'household-card';
     
-    // Highlighted Ration Card No
     const highlightedCard = highlightMatch(household.ration_card, filterState.query);
     
-    // Build Members List HTML
     let membersHtml = "";
     household.members.forEach((member, index) => {
       const highlightedName = highlightMatch(member.name, filterState.query);
+      const onboardTag = member.onboarded === "Yes" 
+        ? `<span class="onboarded-tag yes">✓ ઓનબોર્ડ</span>` 
+        : `<span class="onboarded-tag no">⏳ પેન્ડિંગ</span>`;
+
       membersHtml += `
         <div class="member-row">
-          <span class="member-bullet">${index + 1}.</span>
-          <span class="member-name">${highlightedName}</span>
+          <div class="member-left">
+            <span class="member-bullet">${index + 1}.</span>
+            <span class="member-name">${highlightedName}</span>
+          </div>
+          ${onboardTag}
         </div>
       `;
     });
     
-    // Get card type if available
     const cardType = (household.members[0] && household.members[0].card_type) ? household.members[0].card_type : '';
     const typeBadgeHtml = cardType ? `<span class="card-type-badge">${cardType}</span>` : '';
     
@@ -270,6 +283,7 @@ function renderList() {
           <span class="card-num-val">${highlightedCard}</span>
         </div>
         <div class="header-badges">
+          <span class="member-count-badge">${household.members.length} સભ્યો</span>
           ${typeBadgeHtml}
           <span class="status-badge">પાત્ર (Active)</span>
         </div>
@@ -278,12 +292,15 @@ function renderList() {
         <div class="member-list-title">લાભાર્થી સભ્યો (Members)</div>
         ${membersHtml}
       </div>
+      <div class="card-footer-info">
+        <span>દુકાન: ભરતભાઈ હરગોવનજી બારોટ (૨૩૧૦)</span>
+        <span>સ્થળ: પળી (૧૪૭૮૫)</span>
+      </div>
     `;
     
     listContainer.appendChild(cardEl);
   });
   
-  // Show / Hide pagination button
   if (filterState.filteredHouseholds.length > filterState.displayedCount) {
     loadMoreContainer.style.display = 'flex';
   } else {
@@ -291,7 +308,7 @@ function renderList() {
   }
 }
 
-// Bind search input listeners
+// Bind search & filter listeners
 searchInput.addEventListener('input', (e) => {
   performSearch(e.target.value);
 });
@@ -307,6 +324,21 @@ loadMoreBtn.addEventListener('click', () => {
   renderList();
 });
 
+// Category filter pills listener
+const filterPillsContainer = document.getElementById('filter-pills-container');
+if (filterPillsContainer) {
+  filterPillsContainer.addEventListener('click', (e) => {
+    const pill = e.target.closest('.filter-pill');
+    if (!pill) return;
+    
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    
+    const filter = pill.getAttribute('data-filter');
+    performSearch(undefined, filter);
+  });
+}
+
 /* ==========================================================================
    5. Home Search Redirect
    ========================================================================== */
@@ -314,16 +346,11 @@ loadMoreBtn.addEventListener('click', () => {
 function executeQuickSearch() {
   const query = quickSearchInput.value;
   if (query.trim() !== "") {
-    // Set value on main search bar
     searchInput.value = query;
-    // Go to list tab hash
     window.location.hash = '#list';
-    // Run search
     performSearch(query);
-    // Clear quick input
     quickSearchInput.value = "";
   } else {
-    // If empty input, just transition to list tab
     window.location.hash = '#list';
   }
 }
@@ -336,8 +363,33 @@ quickSearchInput.addEventListener('keypress', (e) => {
 });
 
 /* ==========================================================================
-   6. Simple Info Page Handler (Accordion logic removed)
+   6. Image Lightbox Handler
    ========================================================================== */
+
+function initLightbox() {
+  const modal = document.getElementById('image-lightbox-modal');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const caption = document.getElementById('lightbox-caption');
+  const closeBtn = document.getElementById('lightbox-close-btn');
+  const overlay = document.getElementById('lightbox-overlay');
+
+  if (!modal) return;
+
+  document.querySelectorAll('.process-step-card .step-image-container').forEach((card, idx) => {
+    card.addEventListener('click', () => {
+      const img = card.querySelector('img');
+      if (img) {
+        lightboxImg.src = img.src;
+        caption.textContent = `સ્ટેપ ${idx + 1} વિગતવાર સ્ક્રીનશોટ`;
+        modal.classList.add('open');
+      }
+    });
+  });
+
+  const closeModal = () => modal.classList.remove('open');
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (overlay) overlay.addEventListener('click', closeModal);
+}
 
 /* ==========================================================================
    7. Application Bootstrapping
@@ -346,4 +398,5 @@ quickSearchInput.addEventListener('keypress', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
   initRouter();
   loadData();
+  initLightbox();
 });
