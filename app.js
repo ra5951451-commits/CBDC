@@ -4096,22 +4096,22 @@ function renderList() {
     cardEl.innerHTML = `
       <div class="household-header">
         <div class="card-num-label">
-          રેશન કાર્ડ નં:
+          🪪 રેશન કાર્ડ:
           <span class="card-num-val">${highlightedCard}</span>
         </div>
         <div class="header-badges">
-          <span class="member-count-badge">${household.members.length} સભ્યો</span>
+          <span class="member-count-badge">👥 ${household.members.length}</span>
           ${typeBadgeHtml}
-          <span class="status-badge">પાત્ર (Active)</span>
+          <span class="status-badge">✓ પાત્ર</span>
         </div>
       </div>
       <div class="household-body">
-        <div class="member-list-title">લાભાર્થી સભ્યો (Members)</div>
+        <div class="member-list-title">👥 સભ્યો</div>
         ${membersHtml}
       </div>
       <div class="card-footer-info">
-        <span>દુકાન: ભરતભાઈ હરગોવનજી બારોટ (૨૩૧૦)</span>
-        <span>સ્થળ: પળી (૧૪૭૮૫)</span>
+        <span>🏪 ભરતભાઈ બારોટ (૨૩૧૦)</span>
+        <span>📍 પળી (૧૪૭૮૫)</span>
       </div>
     `;
     
@@ -4325,7 +4325,7 @@ function renderSharedMobilesWidget() {
       <div class="shared-mobile-item">
         <div class="shared-mobile-header" onclick="this.nextElementSibling.classList.toggle('open')">
           <span class="shared-mobile-num">📱 ${mob}</span>
-          <span class="shared-count-tag">${members.length} સભ્યો સાથે જોડાયેલ ▼</span>
+          <span class="shared-count-tag">👥 ${members.length} સભ્યો ▼</span>
         </div>
         <div class="shared-members-body">
           ${memberRows}
@@ -4356,7 +4356,7 @@ function renderFamilyBreakdownWidget() {
     html += `
       <div class="breakdown-card">
         <div class="breakdown-num">${sizeCounts[size]}</div>
-        <div class="breakdown-label">${size} સભ્ય(ઓ) ધરાવતા કુટુંબ</div>
+        <div class="breakdown-label">${size} સભ્યો</div>
       </div>
     `;
   });
@@ -4379,7 +4379,7 @@ function renderCardTypesWidget() {
     html += `
       <div class="breakdown-card">
         <div class="breakdown-num">${typeCounts[type]}</div>
-        <div class="breakdown-label">કેટેગરી: ${type}</div>
+        <div class="breakdown-label">${type}</div>
       </div>
     `;
   });
