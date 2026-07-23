@@ -1874,62 +1874,104 @@ button, input {
    ========================================================================== */
 
 /* Admin Passcode Lock Card */
+/* Tatali Login Auth Card - Mobile Responsive UI/UX */
 .admin-auth-card {
-  max-width: 440px;
-  margin: 32px auto;
-  text-align: center;
+  max-width: 420px;
+  margin: 24px auto;
   padding: 32px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-top: 4px solid var(--primary-color);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 12px 30px -8px rgba(30, 58, 138, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .admin-auth-icon {
-  font-size: 42px;
-  margin-bottom: 12px;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 16px auto;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.08) 0%, rgba(37, 99, 235, 0.12) 100%);
+  border: 2px solid rgba(30, 58, 138, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
 }
 
 .admin-auth-card h3 {
-  font-size: 20px;
+  font-size: 21px;
+  font-weight: 700;
   color: var(--primary-color);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .admin-auth-card p {
   font-size: 13px;
+  line-height: 1.5;
   color: var(--text-light);
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .admin-login-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 280px;
+  gap: 14px;
+  width: 100%;
+  max-width: 320px;
   margin: 0 auto 12px auto;
 }
 
 .admin-login-form input {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border-color);
+  height: 48px; /* Touch-friendly mobile target */
+  padding: 12px 16px;
+  border: 1.5px solid var(--border-color);
   border-radius: var(--border-radius-md);
   font-family: 'Outfit', 'Noto Sans Gujarati', sans-serif;
-  font-size: 14px;
+  font-size: 15px;
+  color: var(--text-color);
   background: var(--bg-color);
   box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  -webkit-appearance: none;
 }
 
 .admin-login-form input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+  background: #ffffff;
+}
+
+.admin-login-form button#admin-login-btn {
+  height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.admin-login-form button#admin-login-btn:active {
+  transform: scale(0.98);
 }
 
 .admin-pin-error {
-  font-size: 12px;
+  font-size: 13px;
   color: #e11d48;
   font-weight: 600;
-  margin-top: 8px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 /* Admin Action Header Bar */
@@ -2469,5 +2511,138 @@ input:checked + .toggle-slider:before {
 @media (min-width: 1440px) {
   .video-container-card {
     max-width: 960px;
+  }
+}
+
+/* Mobile Responsive Overrides for Tatali Login & Portal (< 640px) */
+@media (max-width: 640px) {
+  .admin-auth-card {
+    margin: 16px 12px;
+    padding: 24px 16px;
+    border-radius: var(--border-radius-md);
+  }
+
+  .admin-auth-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 12px;
+  }
+
+  .admin-auth-icon svg {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .admin-auth-card h3 {
+    font-size: 19px;
+  }
+
+  .admin-auth-card p {
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+
+  .admin-login-form {
+    max-width: 100%;
+    gap: 12px;
+  }
+
+  .admin-login-form input {
+    height: 46px;
+    font-size: 14px;
+  }
+
+  .admin-login-form button#admin-login-btn {
+    height: 46px;
+    font-size: 14px;
+  }
+
+  /* Tatali Header Bar */
+  .admin-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .admin-user-info {
+    justify-content: space-between;
+  }
+
+  .admin-actions-right {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .admin-actions-right button {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+    font-size: 11px;
+    padding: 8px 6px;
+  }
+
+  /* Tatali Sub-Navigation Scrollbar */
+  .tatali-subnav-bar {
+    padding: 4px;
+    gap: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tatali-subnav-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tatali-subnav-btn {
+    min-width: 115px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  /* Controls & Search */
+  .admin-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .admin-search-input-wrapper {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-filter-pills {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .admin-filter-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-filter-pill {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  /* Table styling on mobile */
+  .admin-status-table th,
+  .admin-status-table td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .quick-btns-row {
+    flex-direction: column;
+  }
+
+  .quick-btns-row button {
+    width: 100%;
+    justify-content: center;
   }
 }
