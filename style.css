@@ -1873,94 +1873,142 @@ button, input {
    Admin Portal & Analytics System Styles
    ========================================================================== */
 
+/* Entrance animation for login card */
+@keyframes loginCardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes iconPulse {
+  0%, 100% { box-shadow: 0 4px 12px rgba(11, 26, 58, 0.1); }
+  50% { box-shadow: 0 4px 20px rgba(11, 26, 58, 0.22); }
+}
+
 /* Admin Passcode Lock Card */
-/* Tatali Login Auth Card - Mobile Responsive UI/UX */
+/* Tatali Login Auth Card - Fully Responsive Mobile-First UI/UX */
 .admin-auth-card {
-  max-width: 420px;
-  margin: 24px auto;
-  padding: 32px 24px;
+  width: 100%;
+  max-width: 440px;
+  margin: 20px auto;
+  padding: clamp(24px, 5vw, 36px) clamp(18px, 4vw, 28px);
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-top: 4px solid var(--primary-color);
   border-radius: var(--border-radius-lg);
-  box-shadow: 0 12px 30px -8px rgba(30, 58, 138, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 12px 30px -8px rgba(11, 26, 58, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
   text-align: center;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: loginCardSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  box-sizing: border-box;
 }
 
 .admin-auth-icon {
-  width: 68px;
-  height: 68px;
-  margin: 0 auto 16px auto;
-  background: linear-gradient(135deg, rgba(30, 58, 138, 0.08) 0%, rgba(37, 99, 235, 0.12) 100%);
-  border: 2px solid rgba(30, 58, 138, 0.15);
+  width: clamp(56px, 12vw, 72px);
+  height: clamp(56px, 12vw, 72px);
+  margin: 0 auto clamp(12px, 3vw, 18px) auto;
+  background: linear-gradient(135deg, rgba(11, 26, 58, 0.07) 0%, rgba(22, 48, 101, 0.14) 100%);
+  border: 2px solid rgba(11, 26, 58, 0.12);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+  box-shadow: 0 4px 12px rgba(11, 26, 58, 0.1);
+  animation: iconPulse 3s ease-in-out infinite;
+}
+
+.admin-auth-icon svg {
+  width: clamp(32px, 8vw, 52px) !important;
+  height: clamp(32px, 8vw, 52px) !important;
 }
 
 .admin-auth-card h3 {
-  font-size: 21px;
+  font-size: clamp(17px, 4vw, 22px);
   font-weight: 700;
   color: var(--primary-color);
   margin-bottom: 6px;
+  line-height: 1.3;
 }
 
 .admin-auth-card p {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: clamp(12px, 2.8vw, 14px);
+  line-height: 1.55;
   color: var(--text-light);
-  margin-bottom: 22px;
+  margin-bottom: clamp(16px, 4vw, 24px);
+  padding: 0 4px;
 }
 
 .admin-login-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: clamp(10px, 2.5vw, 14px);
   width: 100%;
-  max-width: 320px;
-  margin: 0 auto 12px auto;
+  max-width: 340px;
+  margin: 0 auto clamp(8px, 2vw, 14px) auto;
+}
+
+.admin-login-form .input-group {
+  position: relative;
+  width: 100%;
 }
 
 .admin-login-form input {
   width: 100%;
-  height: 48px; /* Touch-friendly mobile target */
-  padding: 12px 16px;
+  height: 50px; /* Touch-friendly minimum 48px target */
+  padding: 13px 16px;
   border: 1.5px solid var(--border-color);
   border-radius: var(--border-radius-md);
   font-family: 'Outfit', 'Noto Sans Gujarati', sans-serif;
-  font-size: 15px;
+  font-size: clamp(14px, 3.2vw, 16px);
   color: var(--text-color);
   background: var(--bg-color);
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   -webkit-appearance: none;
+  appearance: none;
+}
+
+.admin-login-form input::placeholder {
+  color: var(--text-light);
+  opacity: 0.7;
+  font-size: clamp(12.5px, 2.8vw, 14px);
 }
 
 .admin-login-form input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+  box-shadow: 0 0 0 4px rgba(11, 26, 58, 0.12);
   background: #ffffff;
 }
 
 .admin-login-form button#admin-login-btn {
-  height: 48px;
-  font-size: 15px;
+  height: 50px;
+  font-size: clamp(14px, 3.2vw, 16px);
   font-weight: 600;
   border-radius: var(--border-radius-md);
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-  transition: transform 0.15s ease, background-color 0.2s ease;
+  box-shadow: 0 4px 14px rgba(11, 26, 58, 0.2);
+  transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.admin-login-form button#admin-login-btn:hover {
+  box-shadow: 0 6px 20px rgba(11, 26, 58, 0.28);
+  transform: translateY(-1px);
 }
 
 .admin-login-form button#admin-login-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(11, 26, 58, 0.15);
 }
 
 .admin-pin-error {
-  font-size: 13px;
+  font-size: clamp(11.5px, 2.6vw, 13px);
   color: #e11d48;
   font-weight: 600;
   margin-top: 12px;
@@ -1972,6 +2020,7 @@ button, input {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  animation: loginCardSlideUp 0.3s ease forwards;
 }
 
 /* Admin Action Header Bar */
@@ -2514,32 +2563,70 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* Mobile Responsive Overrides for Tatali Login & Portal (< 640px) */
-@media (max-width: 640px) {
+/* ==========================================================================
+   Tatali Login & Portal — Multi-Breakpoint Responsive System
+   ========================================================================== */
+
+/* --- Tablet / Small Desktop (≤ 768px) --- */
+@media (max-width: 768px) {
   .admin-auth-card {
-    margin: 16px 12px;
-    padding: 24px 16px;
-    border-radius: var(--border-radius-md);
-  }
-
-  .admin-auth-icon {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 12px;
-  }
-
-  .admin-auth-icon svg {
-    width: 36px !important;
-    height: 36px !important;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 28px 22px;
   }
 
   .admin-auth-card h3 {
-    font-size: 19px;
+    font-size: 20px;
   }
 
   .admin-auth-card p {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .admin-login-form {
+    max-width: 320px;
+  }
+
+  /* Section header adjustments */
+  #admin-tab .section-header h2 {
+    font-size: 18px;
+  }
+
+  #admin-tab .section-header .section-desc {
     font-size: 12px;
+  }
+}
+
+/* --- Standard Phones (≤ 640px) — Primary Mobile Breakpoint --- */
+@media (max-width: 640px) {
+
+  /* Login Card — Full width, immersive mobile feel */
+  .admin-auth-card {
+    max-width: 100%;
+    margin: 14px 12px;
+    padding: 28px 20px 24px;
+    border-radius: 18px;
+    border-top-width: 3px;
+    box-shadow: 0 8px 24px -6px rgba(11, 26, 58, 0.10), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  }
+
+  .admin-auth-icon {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 14px;
+  }
+
+  .admin-auth-card h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+
+  .admin-auth-card p {
+    font-size: 12.5px;
+    line-height: 1.5;
     margin-bottom: 18px;
+    padding: 0 2px;
   }
 
   .admin-login-form {
@@ -2548,13 +2635,43 @@ input:checked + .toggle-slider:before {
   }
 
   .admin-login-form input {
-    height: 46px;
-    font-size: 14px;
+    height: 48px;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .admin-login-form input::placeholder {
+    font-size: 13px;
   }
 
   .admin-login-form button#admin-login-btn {
-    height: 46px;
-    font-size: 14px;
+    height: 48px;
+    font-size: 15px;
+    border-radius: 12px;
+    margin-top: 2px;
+  }
+
+  .admin-pin-error {
+    font-size: 12px;
+    padding: 9px 12px;
+    margin-top: 10px;
+  }
+
+  /* Section Header — tighter mobile layout */
+  #admin-tab .section-header {
+    margin-bottom: 14px;
+    padding: 0 2px;
+  }
+
+  #admin-tab .section-header h2 {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  #admin-tab .section-header .section-desc {
+    font-size: 11.5px;
+    line-height: 1.5;
   }
 
   /* Tatali Header Bar */
@@ -2567,6 +2684,16 @@ input:checked + .toggle-slider:before {
 
   .admin-user-info {
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .admin-badge {
+    font-size: 12px;
+  }
+
+  .last-sync-time {
+    font-size: 10.5px;
   }
 
   .admin-actions-right {
@@ -2579,8 +2706,9 @@ input:checked + .toggle-slider:before {
     flex: 1;
     justify-content: center;
     text-align: center;
-    font-size: 11px;
-    padding: 8px 6px;
+    font-size: 11.5px;
+    padding: 10px 8px;
+    min-height: 42px;
   }
 
   /* Tatali Sub-Navigation Scrollbar */
@@ -2589,6 +2717,7 @@ input:checked + .toggle-slider:before {
     gap: 4px;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   .tatali-subnav-bar::-webkit-scrollbar {
@@ -2596,8 +2725,8 @@ input:checked + .toggle-slider:before {
   }
 
   .tatali-subnav-btn {
-    min-width: 115px;
-    padding: 8px 10px;
+    min-width: 110px;
+    padding: 9px 10px;
     font-size: 11px;
   }
 
@@ -2617,6 +2746,7 @@ input:checked + .toggle-slider:before {
     overflow-x: auto;
     padding-bottom: 4px;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   .admin-filter-pills::-webkit-scrollbar {
@@ -2627,7 +2757,7 @@ input:checked + .toggle-slider:before {
     white-space: nowrap;
     flex-shrink: 0;
     font-size: 11px;
-    padding: 6px 10px;
+    padding: 7px 11px;
   }
 
   /* Table styling on mobile */
@@ -2644,5 +2774,142 @@ input:checked + .toggle-slider:before {
   .quick-btns-row button {
     width: 100%;
     justify-content: center;
+    min-height: 42px;
   }
 }
+
+/* --- Extra Small Phones (≤ 380px) — iPhone SE, Galaxy S series, etc. --- */
+@media (max-width: 380px) {
+
+  .admin-auth-card {
+    margin: 10px 8px;
+    padding: 22px 14px 20px;
+    border-radius: 14px;
+  }
+
+  .admin-auth-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+  }
+
+  .admin-auth-icon svg {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .admin-auth-card h3 {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  .admin-auth-card p {
+    font-size: 11.5px;
+    line-height: 1.45;
+    margin-bottom: 14px;
+    padding: 0;
+  }
+
+  .admin-login-form {
+    gap: 10px;
+  }
+
+  .admin-login-form input {
+    height: 46px;
+    padding: 11px 12px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .admin-login-form input::placeholder {
+    font-size: 12px;
+  }
+
+  .admin-login-form button#admin-login-btn {
+    height: 46px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .admin-pin-error {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  /* Section header */
+  #admin-tab .section-header h2 {
+    font-size: 15px;
+  }
+
+  #admin-tab .section-header .section-desc {
+    font-size: 11px;
+  }
+
+  /* Navigation buttons */
+  .tatali-subnav-btn {
+    min-width: 100px;
+    padding: 8px 8px;
+    font-size: 10.5px;
+  }
+
+  .admin-actions-right button {
+    font-size: 10.5px;
+    padding: 8px 5px;
+  }
+}
+
+/* --- Safe Area Insets for Notched Devices (iPhone X+, etc.) --- */
+@supports (padding: max(0px)) {
+  @media (max-width: 640px) {
+    .admin-auth-card {
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
+    }
+  }
+}
+
+/* --- Landscape Mode on Small Phones — prevent horizontal overflow --- */
+@media (max-height: 500px) and (orientation: landscape) {
+  .admin-auth-card {
+    margin: 10px auto;
+    padding: 16px 20px;
+    max-width: 420px;
+  }
+
+  .admin-auth-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 8px;
+  }
+
+  .admin-auth-icon svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  .admin-auth-card h3 {
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
+
+  .admin-auth-card p {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+
+  .admin-login-form {
+    gap: 8px;
+  }
+
+  .admin-login-form input {
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .admin-login-form button#admin-login-btn {
+    height: 40px;
+    font-size: 13px;
+  }
+}
+
