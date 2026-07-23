@@ -417,8 +417,8 @@
     <!-- ADMIN / TATALI TAB -->
     <section id="admin-tab" class="tab-content">
       <div class="section-header">
-        <h2>પંચાયત તલાટી પોર્ટલ (Tatali Portal)</h2>
-        <p class="section-desc">લાભાર્થી ઓનબોર્ડિંગ સ્થિતિ સંચાલન અને ગહન ડેટા અહેવાલ વિશ્લેષણ.</p>
+        <h2>🏛️ તલાટી પોર્ટલ</h2>
+        <p class="section-desc">ઓનબોર્ડિંગ સંચાલન & ડેટા વિશ્લેષણ</p>
       </div>
 
       <!-- Admin Passcode Login Modal / Lock View -->
@@ -426,18 +426,18 @@
         <div class="admin-auth-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width: 52px; height: 52px; color: var(--primary-color);"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3>તલાટી લૉગિન (Tatali Login)</h3>
-        <p>સંચાલન પેનલમાં પ્રવેશવા માટે તમારું તલાટી આઈડી અને પાસવર્ડ દાખલ કરો.</p>
+        <h3>🔐 તલાટી લૉગિન</h3>
+        <p>તમારું આઈડી અને પાસવર્ડ દાખલ કરો</p>
         <div class="admin-login-form">
           <div class="input-group">
-            <input type="text" id="admin-username-input" placeholder="તલાટી આઈડી (Tatali ID)..." aria-label="તલાટી આઈડી">
+            <input type="text" id="admin-username-input" placeholder="👤 તલાટી આઈડી" aria-label="તલાટી આઈડી">
           </div>
           <div class="input-group">
-            <input type="password" id="admin-password-input" placeholder="પાસવર્ડ (Password)..." aria-label="પાસવર્ડ">
+            <input type="password" id="admin-password-input" placeholder="🔒 પાસવર્ડ" aria-label="પાસવર્ડ">
           </div>
-          <button id="admin-login-btn" class="btn btn-primary" style="width: 100%; margin-top: 6px;">પ્રવેશ કરો (Login)</button>
+          <button id="admin-login-btn" class="btn btn-primary" style="width: 100%; margin-top: 6px;">➜ પ્રવેશ કરો</button>
         </div>
-        <p id="admin-pin-error" class="admin-pin-error" style="display: none;">❌ ખોટો તલાટી આઈડી અથવા પાસવર્ડ!</p>
+        <p id="admin-pin-error" class="admin-pin-error" style="display: none;">❌ ખોટો આઈડી/પાસવર્ડ</p>
       </div>
 
       <!-- Admin Main Dashboard Content (Hidden until unlocked) -->
@@ -446,54 +446,54 @@
         <!-- Admin Action Header -->
         <div class="admin-action-bar">
           <div class="admin-user-info">
-            <span class="admin-badge">🔑 ગ્રામ પંચાયત તલાટી (Tatali)</span>
-            <span class="last-sync-time" id="admin-last-sync">લાઈવ સિંક ચાલુ</span>
+            <span class="admin-badge">🔑 તલાટી</span>
+            <span class="last-sync-time" id="admin-last-sync">🟢 લાઈવ</span>
           </div>
           <div class="admin-actions-right">
-            <button id="admin-export-json-btn" class="btn btn-primary btn-sm">📥 ડાઉનલોડ અપડેટેડ ડેટા (JSON)</button>
-            <button id="admin-logout-btn" class="btn btn-secondary btn-sm">લૉગઆઉટ</button>
+            <button id="admin-export-json-btn" class="btn btn-primary btn-sm">📥 ડાઉનલોડ</button>
+            <button id="admin-logout-btn" class="btn btn-secondary btn-sm">🚪 બહાર</button>
           </div>
         </div>
 
         <!-- Tatali Multi-Subpage Tab Navigation Bar -->
         <div class="tatali-subnav-bar" id="tatali-subnav-bar">
           <button class="tatali-subnav-btn active" data-tatali-page="dashboard">
-            📊 ડેશબોર્ડ (Overview)
+            📊 ડેશબોર્ડ
           </button>
           <button class="tatali-subnav-btn" data-tatali-page="status">
-            ⚙️ સ્ટેટસ મેનેજર (Status)
+            ⚙️ સ્ટેટસ
           </button>
           <button class="tatali-subnav-btn" data-tatali-page="shared">
-            🔍 શેરિંગ ડેટા (Shared Data)
+            🔍 શેરિંગ
           </button>
           <button class="tatali-subnav-btn" data-tatali-page="reports">
-            📁 કેટેગરી કે અહેવાલ (Reports)
+            📁 અહેવાલ
           </button>
         </div>
 
         <!-- SUBPAGE 1: DASHBOARD OVERVIEW -->
         <div class="tatali-subpage-section active" id="tatali-subpage-dashboard">
           <div class="subpage-header">
-            <h3>📊 દ્રશ્ય વિશ્લેષણ ડેશબોર્ડ (Dashboard Overview)</h3>
-            <p>પળી ગ્રામ પંચાયત CBDC યોજનાની મુખ્ય ગણતરીઓ અને સભ્યોની લાઈવ સ્થિતિ.</p>
+            <h3>📊 ડેશબોર્ડ</h3>
+            <p>મુખ્ય ગણતરીઓ & લાઈવ સ્થિતિ</p>
           </div>
 
           <!-- KPI Metrics Summary Grid -->
           <div class="admin-kpi-grid">
             <div class="kpi-card blue">
-              <div class="kpi-label">કુલ સભ્યો (Beneficiaries)</div>
+              <div class="kpi-label">👥 કુલ સભ્યો</div>
               <div class="kpi-value" id="kpi-total-members">270</div>
-              <div class="kpi-sub">આધાર નોંધાયેલ લિસ્ટ</div>
+              <div class="kpi-sub">નોંધાયેલ</div>
             </div>
 
             <div class="kpi-card green">
-              <div class="kpi-label">પાત્ર રેશન કાર્ડ (Households)</div>
+              <div class="kpi-label">🏠 રેશન કાર્ડ</div>
               <div class="kpi-value" id="kpi-total-cards">162</div>
-              <div class="kpi-sub">કુટુંબોનું વ્હાઇટલિસ્ટ</div>
+              <div class="kpi-sub">કુટુંબો</div>
             </div>
 
             <div class="kpi-card emerald">
-              <div class="kpi-label">ઓનબોર્ડ થયેલ સભ્યો (Done)</div>
+              <div class="kpi-label">✅ ઓનબોર્ડ</div>
               <div class="kpi-value" id="kpi-onboarded-members">36</div>
               <div class="kpi-progress-bar">
                 <div class="kpi-progress-fill" id="kpi-onboarded-progress" style="width: 13.3%;"></div>
@@ -502,24 +502,24 @@
             </div>
 
             <div class="kpi-card amber">
-              <div class="kpi-label">શેરિંગ મોબાઈલ નંબર</div>
+              <div class="kpi-label">📱 શેર્ડ મોબાઈલ</div>
               <div class="kpi-value" id="kpi-shared-mobiles">48</div>
-              <div class="kpi-sub">૧ કરતાં વધુ સભ્યો ધરાવે છે</div>
+              <div class="kpi-sub">૧+ સભ્યો</div>
             </div>
 
             <div class="kpi-card purple">
-              <div class="kpi-label">શેરિંગ રેશનકાર્ડ (૨+ સભ્યો)</div>
+              <div class="kpi-label">🔗 શેર્ડ કાર્ડ</div>
               <div class="kpi-value" id="kpi-shared-cards">67</div>
-              <div class="kpi-sub">બહુ-સભ્યો ધરાવતા કુટુંબો</div>
+              <div class="kpi-sub">૨+ સભ્યો</div>
             </div>
           </div>
 
           <!-- Quick Navigation Shortcuts -->
           <div class="dashboard-quick-actions">
-            <h4>ઝડપી સંચાલન એક્શન્સ (Quick Shortcuts):</h4>
+            <h4>⚡ ઝડપી એક્શન</h4>
             <div class="quick-btns-row">
-              <button class="btn btn-primary" onclick="switchTataliSubpage('status')">⚙️ સ્ટેટસ મેનેજરમાં જઈ સ્થિતિ બદલો &rarr;</button>
-              <button class="btn btn-secondary" onclick="switchTataliSubpage('shared')">🔍 શેરિંગ મોબાઈલ/રેશનકાર્ડ વિશ્લેષણ જુઓ &rarr;</button>
+              <button class="btn btn-primary" onclick="switchTataliSubpage('status')">⚙️ સ્ટેટસ બદલો →</button>
+              <button class="btn btn-secondary" onclick="switchTataliSubpage('shared')">🔍 શેરિંગ જુઓ →</button>
             </div>
           </div>
         </div>
@@ -528,19 +528,19 @@
         <div class="tatali-subpage-section" id="tatali-subpage-status">
           <div class="admin-management-section">
             <div class="admin-table-header-block">
-              <h3>⚙️ લાભાર્થી ઓનબોર્ડિંગ સ્થિતિ સંચાલન (Status Manager)</h3>
-              <p>લાભાર્થીનું સ્ટેટસ પેન્ડિંગ કે ઓનબોર્ડ કરવા માટે ૧-ક્લિક સ્વિચ પર ક્લિક કરો.</p>
+              <h3>⚙️ સ્ટેટસ મેનેજર</h3>
+              <p>૧-ક્લિક સ્વિચ વડે સ્ટેટસ બદલો</p>
             </div>
 
             <!-- Controls: Search & Filter -->
             <div class="admin-controls-row">
               <div class="admin-search-input-wrapper">
-                <input type="text" id="admin-search-input" placeholder="નામ, રેશનકાર્ડ અથવા મોબાઈલ વડે શોધો..." aria-label="તલાટી શોધો">
+                <input type="text" id="admin-search-input" placeholder="🔎 શોધો..." aria-label="તલાટી શોધો">
               </div>
               <div class="admin-filter-pills">
-                <button class="admin-filter-pill active" data-admin-filter="ALL">બધા સભ્યો (270)</button>
-                <button class="admin-filter-pill" data-admin-filter="PENDING">⏳ પેન્ડિંગ (Pending)</button>
-                <button class="admin-filter-pill" data-admin-filter="ONBOARDED">✅ ઓનબોર્ડેડ (Onboarded)</button>
+                <button class="admin-filter-pill active" data-admin-filter="ALL">📋 બધા (270)</button>
+                <button class="admin-filter-pill" data-admin-filter="PENDING">⏳ પેન્ડિંગ</button>
+                <button class="admin-filter-pill" data-admin-filter="ONBOARDED">✅ ઓનબોર્ડ</button>
               </div>
             </div>
 
@@ -549,13 +549,13 @@
               <table class="admin-status-table">
                 <thead>
                   <tr>
-                    <th>ક્રમ</th>
-                    <th>લાભાર્થીનું નામ</th>
-                    <th>રેશન કાર્ડ નંબર</th>
-                    <th>કાર્ડ પ્રકાર</th>
-                    <th>મોબાઈલ નંબર</th>
-                    <th>સ્થિતિ (Status)</th>
-                    <th>એક્શન (Action)</th>
+                    <th>#</th>
+                    <th>👤 નામ</th>
+                    <th>🪪 કાર્ડ નં.</th>
+                    <th>🏷️ પ્રકાર</th>
+                    <th>📱 મોબાઈલ</th>
+                    <th>📌 સ્થિતિ</th>
+                    <th>⚡</th>
                   </tr>
                 </thead>
                 <tbody id="admin-table-body">
@@ -570,20 +570,20 @@
         <!-- SUBPAGE 3: SHARED DATA INSPECTOR -->
         <div class="tatali-subpage-section" id="tatali-subpage-shared">
           <div class="subpage-header">
-            <h3>🔍 શેરિંગ ડેટા વિશ્લેષણ (Shared Data Inspector)</h3>
-            <p>એક જ મોબાઈલ નંબર ધરાવતા લાભાર્થીઓ અને કુટુંબ કદનું પૃથ્ધકરણ.</p>
+            <h3>🔍 શેરિંગ વિશ્લેષણ</h3>
+            <p>શેર્ડ મોબાઈલ & કુટુંબ કદ</p>
           </div>
 
           <div class="admin-analytics-container">
             <div class="analytics-tabs-header">
-              <button class="analytics-tab-btn active" data-analytics="mobiles">📱 મોબાઇલ નંબર શેરિંગ પૃથ્થકરણ (48)</button>
-              <button class="analytics-tab-btn" data-analytics="family">👨‍👩‍👧‍👦 રેશનકાર્ડ કુટુંબ વહેંચણી (162)</button>
+              <button class="analytics-tab-btn active" data-analytics="mobiles">📱 મોબાઈલ શેરિંગ (48)</button>
+              <button class="analytics-tab-btn" data-analytics="family">👨‍👩‍👧‍👦 કુટુંબ વહેંચણી (162)</button>
             </div>
 
             <div class="analytics-tab-content active" id="analytics-mobiles-content">
               <div class="analytics-box-header">
-                <h4>એક જ મોબાઈલ નંબર ધરાવતા સભ્યોનું લિસ્ટ</h4>
-                <p>નીચે દર્શાવેલ ૧૯૫ પૈકી ૪૮ મોબાઈલ નંબરો ૧ કરતા વધુ લાભાર્થીઓ સાથે જોડાયેલા છે.</p>
+                <h4>📱 શેર્ડ મોબાઈલ લિસ્ટ</h4>
+                <p>૪૮ નંબર ૧+ લાભાર્થી સાથે</p>
               </div>
               <div class="shared-mobiles-list" id="shared-mobiles-list">
                 <!-- Dynamically populated -->
@@ -592,7 +592,7 @@
 
             <div class="analytics-tab-content" id="analytics-family-content">
               <div class="analytics-box-header">
-                <h4>રેશન કાર્ડ દીઠ સભ્યોની સંખ્યા (Family Size Distribution)</h4>
+                <h4>👨‍👩‍👧‍👦 કુટુંબ કદ વિભાજન</h4>
               </div>
               <div class="family-breakdown-grid" id="family-breakdown-grid">
                 <!-- Dynamically populated -->
@@ -604,13 +604,13 @@
         <!-- SUBPAGE 4: CATEGORIES & REPORTS EXPORT -->
         <div class="tatali-subpage-section" id="tatali-subpage-reports">
           <div class="subpage-header">
-            <h3>📁 કેટેગરી વહેંચણી અને અહેવાલ ડાઉનલોડ (Reports & Export)</h3>
-            <p>રેશનકાર્ડ કેટેગરીનું સરવૈયું અને રજિસ્ટર અહેવાલ ડાઉનલોડ કેન્દ્ર.</p>
+            <h3>📁 અહેવાલ & ડાઉનલોડ</h3>
+            <p>કેટેગરી સરવૈયું & ડાઉનલોડ</p>
           </div>
 
           <div class="admin-analytics-container">
             <div class="analytics-box-header" style="padding: 18px 18px 0 18px;">
-              <h4>🏷️ રેશનકાર્ડ પ્રકાર અનુસાર વિભાજન (PHH, APL-1, BPL, AAY)</h4>
+              <h4>🏷️ કાર્ડ પ્રકાર વિભાજન</h4>
             </div>
             <div style="padding: 18px;">
               <div class="card-types-grid" id="card-types-grid">
@@ -620,9 +620,9 @@
           </div>
 
           <div class="report-export-box card" style="padding: 24px; text-align: center;">
-            <h4>📥 અહેવાલ ફાઈલ ડાઉનલોડ ડેશબોર્ડ</h4>
-            <p style="font-size: 13px; color: var(--text-light); margin: 8px 0 16px 0;">અપડેટ થયેલ લાભાર્થી ઓનબોર્ડિંગ ડેટાની સત્તાવાર JSON ફાઈલ ડાઉનલોડ કરો.</p>
-            <button onclick="exportUpdatedJSON()" class="btn btn-primary">📥 ડાઉનલોડ લાઈવ ડેટા (JSON)</button>
+            <h4>📥 ડેટા ડાઉનલોડ</h4>
+            <p style="font-size: 13px; color: var(--text-light); margin: 8px 0 16px 0;">લાઈવ JSON ડેટા ફાઈલ</p>
+            <button onclick="exportUpdatedJSON()" class="btn btn-primary">📥 ડાઉનલોડ JSON</button>
           </div>
         </div>
 
