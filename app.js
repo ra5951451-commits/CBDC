@@ -4186,6 +4186,17 @@ function initAdminAuth() {
 
   if (exportBtn) exportBtn.addEventListener('click', exportUpdatedJSON);
 
+  // Tatali Subnav Bar click listener
+  const subnavBar = document.getElementById('tatali-subnav-bar');
+  if (subnavBar) {
+    subnavBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.tatali-subnav-btn');
+      if (!btn) return;
+      const pageId = btn.getAttribute('data-tatali-page');
+      switchTataliSubpage(pageId);
+    });
+  }
+
   // Admin filter pills
   const adminPillsContainer = document.querySelector('.admin-filter-pills');
   if (adminPillsContainer) {
@@ -4224,6 +4235,30 @@ function initAdminAuth() {
     });
   }
 }
+
+function switchTataliSubpage(subpageId) {
+  adminState.activeSubpage = subpageId;
+
+  document.querySelectorAll('.tatali-subnav-btn').forEach(btn => {
+    if (btn.getAttribute('data-tatali-page') === subpageId) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  document.querySelectorAll('.tatali-subpage-section').forEach(sec => {
+    if (sec.id === `tatali-subpage-${subpageId}`) {
+      sec.classList.add('active');
+    } else {
+      sec.classList.remove('active');
+    }
+  });
+
+  renderAdminDashboard();
+}
+
+window.switchTataliSubpage = switchTataliSubpage;
 
 function renderAdminDashboard() {
   if (!adminState.isAuthenticated) return;
