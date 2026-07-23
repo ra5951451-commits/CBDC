@@ -377,7 +377,7 @@ function initAdminAuth() {
       pinError.style.display = 'none';
       if (userInput) userInput.value = '';
       if (passInput) passInput.value = '';
-      showToast("🔓 સ્વાગત છે nikunjdarji! એડમિન લૉગિન સફળ થયું.");
+      showToast("🔓 સ્વાગત છે nikunjdarji! તલાટી (Tatali) લૉગિન સફળ થયું.");
       renderAdminDashboard();
     } else {
       pinError.style.display = 'block';
@@ -392,7 +392,7 @@ function initAdminAuth() {
     adminState.isAuthenticated = false;
     authCard.style.display = 'block';
     dashWrapper.style.display = 'none';
-    showToast("🔒 એડમિન લૉગઆઉટ થયું.");
+    showToast("🔒 તલાટી (Tatali) લૉગઆઉટ થયું.");
   });
 
   if (exportBtn) exportBtn.addEventListener('click', exportUpdatedJSON);
