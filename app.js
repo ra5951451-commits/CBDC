@@ -8,8 +8,8 @@ let appData = {
   metadata: {
     district: "મહેસાણા",
     taluka: "ઊંઝા",
-    fps_area: "પટેલ બાબુભાઈ કાશીરામદાસ : 2312 (પળી : 14785 - કાયમી )",
-    generated_on: "03/03/2026 13:44:12"
+    fps_area: "ભરતભાઈ હરગોવનજી બારોટ : 2310 (પળી : 14785 - હંગામી )",
+    generated_on: "22/07/2026 16:11:28"
   },
   beneficiaries: [],
   households: [] // Grouped by ration card
@@ -259,13 +259,20 @@ function renderList() {
       `;
     });
     
+    // Get card type if available
+    const cardType = (household.members[0] && household.members[0].card_type) ? household.members[0].card_type : '';
+    const typeBadgeHtml = cardType ? `<span class="card-type-badge">${cardType}</span>` : '';
+    
     cardEl.innerHTML = `
       <div class="household-header">
         <div class="card-num-label">
           રેશન કાર્ડ નં:
           <span class="card-num-val">${highlightedCard}</span>
         </div>
-        <span class="status-badge">પાત્ર (Active)</span>
+        <div class="header-badges">
+          ${typeBadgeHtml}
+          <span class="status-badge">પાત્ર (Active)</span>
+        </div>
       </div>
       <div class="household-body">
         <div class="member-list-title">લાભાર્થી સભ્યો (Members)</div>
