@@ -34,6 +34,7 @@
         <button class="nav-item" data-tab="list-tab">પાત્ર યાદી</button>
         <button class="nav-item" data-tab="process-tab">CBDC કરવાના સ્ટેપ</button>
         <button class="nav-item" data-tab="info-tab">યોજના વિશે માહિતી</button>
+        <button class="nav-item admin-nav-btn" data-tab="admin-tab">🔒 એડમિન પેનલ</button>
       </nav>
     </div>
   </header>
@@ -410,6 +411,157 @@
       </div>
     </section>
 
+    <!-- ADMIN TAB -->
+    <section id="admin-tab" class="tab-content">
+      <div class="section-header">
+        <h2>પંચાયત એડમિન પોર્ટલ (Admin Portal)</h2>
+        <p class="section-desc">લાભાર્થી ઓનબોર્ડિંગ સ્થિતિ સંચાલન અને ગહન ડેટા અહેવાલ વિશ્લેષણ.</p>
+      </div>
+
+      <!-- Admin Passcode Login Modal / Lock View -->
+      <div id="admin-auth-card" class="card admin-auth-card">
+        <div class="admin-auth-icon">🔐</div>
+        <h3>એડમિન લૉગિન જરૂરી છે</h3>
+        <p>સંચાલન પેનલમાં પ્રવેશવા માટે પંચાયત એડમિન પાસકોડ દાખલ કરો (ડિફોલ્ટ PIN: <strong>1234</strong>)</p>
+        <div class="admin-pin-form">
+          <input type="password" id="admin-pin-input" maxlength="6" placeholder="PIN દાખલ કરો..." aria-label="એડમિન પિન">
+          <button id="admin-login-btn" class="btn btn-primary">પ્રવેશ કરો</button>
+        </div>
+        <p id="admin-pin-error" class="admin-pin-error" style="display: none;">❌ ખોટો PIN! કૃપા કરીને સાચો PIN દાખલ કરો.</p>
+      </div>
+
+      <!-- Admin Main Dashboard Content (Hidden until unlocked) -->
+      <div id="admin-dashboard-wrapper" style="display: none;">
+        
+        <!-- Admin Action Header -->
+        <div class="admin-action-bar">
+          <div class="admin-user-info">
+            <span class="admin-badge">🔑 ગ્રામ પંચાયત એડમિન</span>
+            <span class="last-sync-time" id="admin-last-sync">લાઈવ સિંક ચાલુ</span>
+          </div>
+          <div class="admin-actions-right">
+            <button id="admin-export-json-btn" class="btn btn-primary btn-sm">📥 ડાઉનલોડ અપડેટેડ ડેટા (JSON)</button>
+            <button id="admin-logout-btn" class="btn btn-secondary btn-sm">લૉગઆઉટ</button>
+          </div>
+        </div>
+
+        <!-- KPI Metrics Summary Grid -->
+        <div class="admin-kpi-grid">
+          <div class="kpi-card blue">
+            <div class="kpi-label">કુલ સભ્યો (Beneficiaries)</div>
+            <div class="kpi-value" id="kpi-total-members">270</div>
+            <div class="kpi-sub">આધાર નોંધાયેલ લિસ્ટ</div>
+          </div>
+
+          <div class="kpi-card green">
+            <div class="kpi-label">પાત્ર રેશન કાર્ડ (Households)</div>
+            <div class="kpi-value" id="kpi-total-cards">162</div>
+            <div class="kpi-sub">કુટુંબોનું વ્હાઇટલિસ્ટ</div>
+          </div>
+
+          <div class="kpi-card emerald">
+            <div class="kpi-label">ઓનબોર્ડ થયેલ સભ્યો (Done)</div>
+            <div class="kpi-value" id="kpi-onboarded-members">36</div>
+            <div class="kpi-progress-bar">
+              <div class="kpi-progress-fill" id="kpi-onboarded-progress" style="width: 13.3%;"></div>
+            </div>
+            <div class="kpi-sub" id="kpi-onboarded-percent">13.3% પૂર્ણ થયું</div>
+          </div>
+
+          <div class="kpi-card amber">
+            <div class="kpi-label">શેરિંગ મોબાઈલ નંબર</div>
+            <div class="kpi-value" id="kpi-shared-mobiles">48</div>
+            <div class="kpi-sub">૧ કરતાં વધુ સભ્યો ધરાવે છે</div>
+          </div>
+
+          <div class="kpi-card purple">
+            <div class="kpi-label">શેરિંગ રેશનકાર્ડ (૨+ સભ્યો)</div>
+            <div class="kpi-value" id="kpi-shared-cards">67</div>
+            <div class="kpi-sub">બહુ-સભ્યો ધરાવતા કુટુંબો</div>
+          </div>
+        </div>
+
+        <!-- Interactive Data Analytics Inspector Section -->
+        <div class="admin-analytics-container">
+          <div class="analytics-tabs-header">
+            <button class="analytics-tab-btn active" data-analytics="mobiles">📱 મોબાઇલ નંબર શેરિંગ પૃથ્થકરણ (48)</button>
+            <button class="analytics-tab-btn" data-analytics="family">👨‍👩‍👧‍👦 રેશનકાર્ડ કુટુંબ વહેંચણી (162)</button>
+            <button class="analytics-tab-btn" data-analytics="types">🏷️ કાર્ડ કેટેગરી વહેંચણી</button>
+          </div>
+
+          <div class="analytics-tab-content active" id="analytics-mobiles-content">
+            <div class="analytics-box-header">
+              <h4>એક જ મોબાઈલ નંબર ધરાવતા સભ્યોનું લિસ્ટ</h4>
+              <p>નીચે દર્શાવેલ ૧૯૫ પૈકી ૪૮ મોબાઈલ નંબરો ૧ કરતા વધુ લાભાર્થીઓ સાથે જોડાયેલા છે.</p>
+            </div>
+            <div class="shared-mobiles-list" id="shared-mobiles-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <div class="analytics-tab-content" id="analytics-family-content">
+            <div class="analytics-box-header">
+              <h4>રેશન કાર્ડ દીઠ સભ્યોની સંખ્યા (Family Size Distribution)</h4>
+            </div>
+            <div class="family-breakdown-grid" id="family-breakdown-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <div class="analytics-tab-content" id="analytics-types-content">
+            <div class="analytics-box-header">
+              <h4>રેશનકાર્ડ પ્રકાર અનુસાર વિભાજન (PHH, APL-1, BPL, AAY)</h4>
+            </div>
+            <div class="card-types-grid" id="card-types-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Onboarding Status Management Table / List Section -->
+        <div class="admin-management-section">
+          <div class="admin-table-header-block">
+            <h3>લાભાર્થી ઓનબોર્ડિંગ સ્થિતિ અપડેટ (Status Manager)</h3>
+            <p>લાભાર્થીનું સ્ટેટસ પેન્ડિંગ કે ઓનબોર્ડ કરવા માટે સ્વિચ પર ક્લિક કરો.</p>
+          </div>
+
+          <!-- Controls: Search & Filter -->
+          <div class="admin-controls-row">
+            <div class="admin-search-input-wrapper">
+              <input type="text" id="admin-search-input" placeholder="નામ, રેશનકાર્ડ અથવા મોબાઈલ વડે શોધો..." aria-label="એડમિન શોધો">
+            </div>
+            <div class="admin-filter-pills">
+              <button class="admin-filter-pill active" data-admin-filter="ALL">બધા સભ્યો (270)</button>
+              <button class="admin-filter-pill" data-admin-filter="PENDING">⏳ પેન્ડિંગ (Pending)</button>
+              <button class="admin-filter-pill" data-admin-filter="ONBOARDED">✅ ઓનબોર્ડેડ (Onboarded)</button>
+            </div>
+          </div>
+
+          <!-- Beneficiary Status Table Container -->
+          <div class="admin-table-container">
+            <table class="admin-status-table">
+              <thead>
+                <tr>
+                  <th>ક્રમ</th>
+                  <th>લાભાર્થીનું નામ</th>
+                  <th>રેશન કાર્ડ નંબર</th>
+                  <th>કાર્ડ પ્રકાર</th>
+                  <th>મોબાઈલ નંબર</th>
+                  <th>સ્થિતિ (Status)</th>
+                  <th>એક્શન (Action)</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
   <!-- Image Lightbox Modal -->
@@ -421,6 +573,9 @@
       <img id="lightbox-img" src="" alt="મોટું ચિત્ર" class="lightbox-img">
     </div>
   </div>
+
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="toast-container"></div>
 
   <!-- Persistent Bottom Tab Navigation Bar -->
   <nav class="app-navbar">
@@ -448,6 +603,12 @@
       <button class="nav-item" data-tab="info-tab">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="nav-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         <span class="nav-label">વધુ માહિતી</span>
+      </button>
+
+      <!-- Nav Admin -->
+      <button class="nav-item admin-nav-btn" data-tab="admin-tab">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="nav-icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <span class="nav-label">એડમિન</span>
       </button>
 
     </div>

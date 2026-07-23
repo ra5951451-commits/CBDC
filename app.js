@@ -22,6 +22,14 @@ let filterState = {
   displayedCount: 15
 };
 
+let adminState = {
+  isAuthenticated: false,
+  passcode: "1234",
+  searchQuery: "",
+  filterStatus: "ALL",
+  onboardingOverrides: {}
+};
+
 // DOM Elements
 const tabs = document.querySelectorAll('.tab-content');
 const navItems = document.querySelectorAll('.nav-item');
@@ -45,7 +53,8 @@ const tabHashMapping = {
   '#home': 'home-tab',
   '#list': 'list-tab',
   '#process': 'process-tab',
-  '#info': 'info-tab'
+  '#info': 'info-tab',
+  '#admin': 'admin-tab'
 };
 
 function initRouter() {
@@ -81,6 +90,10 @@ function switchTab(tabId) {
     }
   });
 
+  if (tabId === 'admin-tab' && adminState.isAuthenticated) {
+    renderAdminDashboard();
+  }
+
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -94,21 +107,34 @@ navItems.forEach(item => {
   });
 });
 
-document.getElementById('action-go-to-list').addEventListener('click', () => {
-  window.location.hash = '#list';
-});
+const actionListBtn = document.getElementById('action-go-to-list');
+if (actionListBtn) actionListBtn.addEventListener('click', () => { window.location.hash = '#list'; });
 
-document.getElementById('action-go-to-process').addEventListener('click', () => {
-  window.location.hash = '#process';
-});
+const actionProcessBtn = document.getElementById('action-go-to-process');
+if (actionProcessBtn) actionProcessBtn.addEventListener('click', () => { window.location.hash = '#process'; });
 
-document.getElementById('info-btn-to-process').addEventListener('click', () => {
-  window.location.hash = '#process';
-});
+const infoProcessBtn = document.getElementById('info-btn-to-process');
+if (infoProcessBtn) infoProcessBtn.addEventListener('click', () => { window.location.hash = '#process'; });
 
 /* ==========================================================================
-   2. Data Loading & Indexing
+   2. Data Loading & LocalStorage Persistence
    ========================================================================== */
+
+function loadOnboardingOverrides() {
+  try {
+    const saved = localStorage.getItem('cbdc_onboarding_overrides');
+    if (saved) {
+      adminState.onboardingOverrides = JSON.parse(saved);
+      appData.beneficiaries.forEach(b => {
+        if (adminState.onboardingOverrides[b.sr_no] !== undefined) {
+          b.onboarded = adminState.onboardingOverrides[b.sr_no];
+        }
+      });
+    }
+  } catch (e) {
+    console.error("Error loading onboarding overrides:", e);
+  }
+}
 
 async function loadData() {
   try {
@@ -121,26 +147,14 @@ async function loadData() {
     appData.metadata = data.metadata;
     appData.beneficiaries = data.beneficiaries;
     
-    // Indexing: Group individual beneficiaries into households by Ration Card
-    const householdGroups = {};
-    appData.beneficiaries.forEach(beneficiary => {
-      const cardNo = beneficiary.ration_card;
-      if (!householdGroups[cardNo]) {
-        householdGroups[cardNo] = {
-          ration_card: cardNo,
-          clean_ration_card: beneficiary.clean_ration_card,
-          members: []
-        };
-      }
-      householdGroups[cardNo].members.push(beneficiary);
-    });
-    
-    appData.households = Object.values(householdGroups);
-    
-    // Update Stats/Metadata in UI
+    // Apply localStorage overrides
+    loadOnboardingOverrides();
+
+    // Group into households
+    groupHouseholds();
+
     lastUpdatedBadge.textContent = `માહિતી અપડેટ: ${appData.metadata.generated_on.split(' ')[0]}`;
     
-    // Initial display
     filterState.filteredHouseholds = [...appData.households];
     renderStats();
     renderList();
@@ -157,6 +171,22 @@ async function loadData() {
   }
 }
 
+function groupHouseholds() {
+  const householdGroups = {};
+  appData.beneficiaries.forEach(beneficiary => {
+    const cardNo = beneficiary.ration_card;
+    if (!householdGroups[cardNo]) {
+      householdGroups[cardNo] = {
+        ration_card: cardNo,
+        clean_ration_card: beneficiary.clean_ration_card,
+        members: []
+      };
+    }
+    householdGroups[cardNo].members.push(beneficiary);
+  });
+  appData.households = Object.values(householdGroups);
+}
+
 /* ==========================================================================
    3. Search & Highlighting & Filtering Logic
    ========================================================================== */
@@ -167,7 +197,6 @@ function performSearch(queryText, category) {
 
   let result = appData.households;
 
-  // Category filter
   if (filterState.selectedCategory !== "ALL") {
     result = result.filter(h => {
       const type = h.members[0] && h.members[0].card_type ? h.members[0].card_type.toUpperCase() : '';
@@ -178,7 +207,6 @@ function performSearch(queryText, category) {
     });
   }
 
-  // Text search query
   if (filterState.query !== "") {
     clearSearchBtn.style.display = 'block';
     const cleanQuery = filterState.query.replace(/\s+/g, '');
@@ -202,7 +230,6 @@ function performSearch(queryText, category) {
 function renderStats() {
   resultsCount.textContent = `કુલ રેશન કાર્ડ: ${filterState.filteredHouseholds.length}`;
   
-  // Home tab live stats
   const homeBeneficiaries = document.getElementById('home-stat-beneficiaries');
   const homeHouseholds = document.getElementById('home-stat-households');
   const homeShop = document.getElementById('home-stat-shop');
@@ -309,38 +336,344 @@ function renderList() {
 }
 
 // Bind search & filter listeners
-searchInput.addEventListener('input', (e) => {
-  performSearch(e.target.value);
-});
+if (searchInput) searchInput.addEventListener('input', (e) => { performSearch(e.target.value); });
+if (clearSearchBtn) clearSearchBtn.addEventListener('click', () => { searchInput.value = ""; performSearch(""); searchInput.focus(); });
+if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => { filterState.displayedCount += 15; renderList(); });
 
-clearSearchBtn.addEventListener('click', () => {
-  searchInput.value = "";
-  performSearch("");
-  searchInput.focus();
-});
-
-loadMoreBtn.addEventListener('click', () => {
-  filterState.displayedCount += 15;
-  renderList();
-});
-
-// Category filter pills listener
 const filterPillsContainer = document.getElementById('filter-pills-container');
 if (filterPillsContainer) {
   filterPillsContainer.addEventListener('click', (e) => {
     const pill = e.target.closest('.filter-pill');
     if (!pill) return;
-    
     document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     pill.classList.add('active');
-    
-    const filter = pill.getAttribute('data-filter');
-    performSearch(undefined, filter);
+    performSearch(undefined, pill.getAttribute('data-filter'));
   });
 }
 
 /* ==========================================================================
-   5. Home Search Redirect
+   5. Admin Portal & Onboarding Management Logic
+   ========================================================================== */
+
+function initAdminAuth() {
+  const pinInput = document.getElementById('admin-pin-input');
+  const loginBtn = document.getElementById('admin-login-btn');
+  const pinError = document.getElementById('admin-pin-error');
+  const authCard = document.getElementById('admin-auth-card');
+  const dashWrapper = document.getElementById('admin-dashboard-wrapper');
+  const logoutBtn = document.getElementById('admin-logout-btn');
+  const exportBtn = document.getElementById('admin-export-json-btn');
+
+  const attemptLogin = () => {
+    if (pinInput.value === adminState.passcode) {
+      adminState.isAuthenticated = true;
+      authCard.style.display = 'none';
+      dashWrapper.style.display = 'block';
+      pinError.style.display = 'none';
+      pinInput.value = '';
+      showToast("🔓 એડમિન લૉગિન સફળ થયું!");
+      renderAdminDashboard();
+    } else {
+      pinError.style.display = 'block';
+    }
+  };
+
+  if (loginBtn) loginBtn.addEventListener('click', attemptLogin);
+  if (pinInput) pinInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
+
+  if (logoutBtn) logoutBtn.addEventListener('click', () => {
+    adminState.isAuthenticated = false;
+    authCard.style.display = 'block';
+    dashWrapper.style.display = 'none';
+    showToast("🔒 એડમિન લૉગઆઉટ થયું.");
+  });
+
+  if (exportBtn) exportBtn.addEventListener('click', exportUpdatedJSON);
+
+  // Admin filter pills
+  const adminPillsContainer = document.querySelector('.admin-filter-pills');
+  if (adminPillsContainer) {
+    adminPillsContainer.addEventListener('click', (e) => {
+      const pill = e.target.closest('.admin-filter-pill');
+      if (!pill) return;
+      document.querySelectorAll('.admin-filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      adminState.filterStatus = pill.getAttribute('data-admin-filter');
+      renderAdminTable();
+    });
+  }
+
+  // Admin search input
+  const adminSearchInput = document.getElementById('admin-search-input');
+  if (adminSearchInput) {
+    adminSearchInput.addEventListener('input', (e) => {
+      adminState.searchQuery = e.target.value;
+      renderAdminTable();
+    });
+  }
+
+  // Analytics tabs
+  const analyticsHeader = document.querySelector('.analytics-tabs-header');
+  if (analyticsHeader) {
+    analyticsHeader.addEventListener('click', (e) => {
+      const tabBtn = e.target.closest('.analytics-tab-btn');
+      if (!tabBtn) return;
+      document.querySelectorAll('.analytics-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.analytics-tab-content').forEach(c => c.classList.remove('active'));
+      
+      tabBtn.classList.add('active');
+      const targetId = `analytics-${tabBtn.getAttribute('data-analytics')}-content`;
+      const targetContent = document.getElementById(targetId);
+      if (targetContent) targetContent.classList.add('active');
+    });
+  }
+}
+
+function renderAdminDashboard() {
+  if (!adminState.isAuthenticated) return;
+
+  const totalMembers = appData.beneficiaries.length;
+  const totalCards = appData.households.length;
+  const onboardedMembers = appData.beneficiaries.filter(b => b.onboarded === "Yes").length;
+  const onboardedPercent = totalMembers > 0 ? ((onboardedMembers / totalMembers) * 100).toFixed(1) : 0;
+
+  const kpiMembers = document.getElementById('kpi-total-members');
+  const kpiCards = document.getElementById('kpi-total-cards');
+  const kpiOnboarded = document.getElementById('kpi-onboarded-members');
+  const kpiProgress = document.getElementById('kpi-onboarded-progress');
+  const kpiPercent = document.getElementById('kpi-onboarded-percent');
+
+  if (kpiMembers) kpiMembers.textContent = totalMembers;
+  if (kpiCards) kpiCards.textContent = totalCards;
+  if (kpiOnboarded) kpiOnboarded.textContent = onboardedMembers;
+  if (kpiProgress) kpiProgress.style.width = `${onboardedPercent}%`;
+  if (kpiPercent) kpiPercent.textContent = `${onboardedPercent}% પૂર્ણ થયું (${totalMembers - onboardedMembers} પેન્ડિંગ)`;
+
+  renderSharedMobilesWidget();
+  renderFamilyBreakdownWidget();
+  renderCardTypesWidget();
+  renderAdminTable();
+}
+
+function renderSharedMobilesWidget() {
+  const container = document.getElementById('shared-mobiles-list');
+  if (!container) return;
+
+  const mobileGroups = {};
+  appData.beneficiaries.forEach(b => {
+    const mob = b.mobile ? b.mobile.strip ? b.mobile.strip() : b.mobile.trim() : '';
+    if (mob) {
+      if (!mobileGroups[mob]) mobileGroups[mob] = [];
+      mobileGroups[mob].push(b);
+    }
+  });
+
+  const sharedMobiles = Object.keys(mobileGroups)
+    .filter(m => mobileGroups[m].length > 1)
+    .sort((a, b) => mobileGroups[b].length - mobileGroups[a].length);
+
+  const kpiSharedMob = document.getElementById('kpi-shared-mobiles');
+  if (kpiSharedMob) kpiSharedMob.textContent = sharedMobiles.length;
+
+  let html = "";
+  sharedMobiles.forEach((mob) => {
+    const members = mobileGroups[mob];
+    let memberRows = "";
+    members.forEach(m => {
+      const statusClass = m.onboarded === "Yes" ? "yes" : "no";
+      const statusText = m.onboarded === "Yes" ? "✓ ઓનબોર્ડ" : "⏳ પેન્ડિંગ";
+      memberRows += `
+        <div class="shared-member-row">
+          <span>${m.name} (રેશન કાર્ડ: ${m.ration_card})</span>
+          <span class="onboarded-tag ${statusClass}">${statusText}</span>
+        </div>
+      `;
+    });
+
+    html += `
+      <div class="shared-mobile-item">
+        <div class="shared-mobile-header" onclick="this.nextElementSibling.classList.toggle('open')">
+          <span class="shared-mobile-num">📱 ${mob}</span>
+          <span class="shared-count-tag">${members.length} સભ્યો સાથે જોડાયેલ ▼</span>
+        </div>
+        <div class="shared-members-body">
+          ${memberRows}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html || `<p style="font-size:12px; color:var(--text-light);">કોઈ શેરિંગ મોબાઈલ નંબર મળેલ નથી.</p>`;
+}
+
+function renderFamilyBreakdownWidget() {
+  const container = document.getElementById('family-breakdown-grid');
+  if (!container) return;
+
+  const sizeCounts = {};
+  appData.households.forEach(h => {
+    const size = h.members.length;
+    sizeCounts[size] = (sizeCounts[size] || 0) + 1;
+  });
+
+  const multiMemberCards = appData.households.filter(h => h.members.length >= 2).length;
+  const kpiSharedCards = document.getElementById('kpi-shared-cards');
+  if (kpiSharedCards) kpiSharedCards.textContent = multiMemberCards;
+
+  let html = "";
+  Object.keys(sizeCounts).sort((a, b) => a - b).forEach(size => {
+    html += `
+      <div class="breakdown-card">
+        <div class="breakdown-num">${sizeCounts[size]}</div>
+        <div class="breakdown-label">${size} સભ્ય(ઓ) ધરાવતા કુટુંબ</div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderCardTypesWidget() {
+  const container = document.getElementById('card-types-grid');
+  if (!container) return;
+
+  const typeCounts = {};
+  appData.beneficiaries.forEach(b => {
+    const t = b.card_type ? b.card_type.toUpperCase() : 'અન્ય';
+    typeCounts[t] = (typeCounts[t] || 0) + 1;
+  });
+
+  let html = "";
+  Object.keys(typeCounts).forEach(type => {
+    html += `
+      <div class="breakdown-card">
+        <div class="breakdown-num">${typeCounts[type]}</div>
+        <div class="breakdown-label">કેટેગરી: ${type}</div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderAdminTable() {
+  const tbody = document.getElementById('admin-table-body');
+  if (!tbody) return;
+
+  let list = appData.beneficiaries;
+
+  if (adminState.filterStatus === "PENDING") {
+    list = list.filter(b => b.onboarded !== "Yes");
+  } else if (adminState.filterStatus === "ONBOARDED") {
+    list = list.filter(b => b.onboarded === "Yes");
+  }
+
+  if (adminState.searchQuery) {
+    const q = adminState.searchQuery.toUpperCase();
+    const cleanQ = q.replace(/\s+/g, '');
+    list = list.filter(b => 
+      b.name.toUpperCase().includes(q) ||
+      b.ration_card.includes(q) ||
+      b.clean_ration_card.includes(cleanQ) ||
+      (b.mobile && b.mobile.includes(q))
+    );
+  }
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--text-light);">કોઈ પરિણામ મળ્યું નથી.</td></tr>`;
+    return;
+  }
+
+  let html = "";
+  list.forEach(b => {
+    const isChecked = b.onboarded === "Yes" ? "checked" : "";
+    const statusTag = b.onboarded === "Yes" 
+      ? `<span class="onboarded-tag yes">✓ ઓનબોર્ડેડ</span>` 
+      : `<span class="onboarded-tag no">⏳ પેન્ડિંગ</span>`;
+
+    html += `
+      <tr>
+        <td><strong>#${b.sr_no}</strong></td>
+        <td><strong>${b.name}</strong></td>
+        <td><span class="card-num-val">${b.ration_card}</span></td>
+        <td><span class="card-type-badge">${b.card_type || '-'}</span></td>
+        <td><span class="shared-mobile-num">${b.mobile || '-'}</span></td>
+        <td>${statusTag}</td>
+        <td>
+          <div class="status-toggle-wrapper">
+            <label class="toggle-switch">
+              <input type="checkbox" ${isChecked} onchange="toggleBeneficiaryStatus(${b.sr_no})">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function toggleBeneficiaryStatus(srNo) {
+  const beneficiary = appData.beneficiaries.find(b => b.sr_no === srNo);
+  if (!beneficiary) return;
+
+  const newStatus = beneficiary.onboarded === "Yes" ? "No" : "Yes";
+  beneficiary.onboarded = newStatus;
+  adminState.onboardingOverrides[srNo] = newStatus;
+
+  try {
+    localStorage.setItem('cbdc_onboarding_overrides', JSON.stringify(adminState.onboardingOverrides));
+  } catch (e) {
+    console.error("Error saving overrides:", e);
+  }
+
+  showToast(newStatus === "Yes" 
+    ? `✅ ${beneficiary.name} — ઓનબોર્ડ સફળતાપૂર્વક અપડેટ થયું!` 
+    : `⏳ ${beneficiary.name} — પેન્ડિંગ સેટ થયું!`);
+
+  groupHouseholds();
+  renderStats();
+  renderList();
+  renderAdminDashboard();
+}
+
+function exportUpdatedJSON() {
+  const exportData = {
+    metadata: {
+      ...appData.metadata,
+      exported_at: new Date().toISOString()
+    },
+    beneficiaries: appData.beneficiaries
+  };
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", `CBDC_Updated_Data_${new Date().toISOString().slice(0,10)}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+
+  showToast("📥 અપડેટેડ ડેટા JSON ફાઈલ ડાઉનલોડ થઈ!");
+}
+
+function showToast(msg) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast-item';
+  toast.innerHTML = msg;
+
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+/* ==========================================================================
+   6. Image Lightbox Handler & Quick Search
    ========================================================================== */
 
 function executeQuickSearch() {
@@ -355,16 +688,8 @@ function executeQuickSearch() {
   }
 }
 
-quickSearchBtn.addEventListener('click', executeQuickSearch);
-quickSearchInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    executeQuickSearch();
-  }
-});
-
-/* ==========================================================================
-   6. Image Lightbox Handler
-   ========================================================================== */
+if (quickSearchBtn) quickSearchBtn.addEventListener('click', executeQuickSearch);
+if (quickSearchInput) quickSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') executeQuickSearch(); });
 
 function initLightbox() {
   const modal = document.getElementById('image-lightbox-modal');
@@ -398,5 +723,6 @@ function initLightbox() {
 document.addEventListener('DOMContentLoaded', () => {
   initRouter();
   loadData();
+  initAdminAuth();
   initLightbox();
 });
