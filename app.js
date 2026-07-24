@@ -4167,7 +4167,7 @@ function initAdminAuth() {
       if (userInput) userInput.value = '';
       if (passInput) passInput.value = '';
       showToast("🔓 સ્વાગત છે nikunjdarji! તલાટી (Tatali) લૉગિન સફળ થયું.");
-      renderAdminDashboard();
+      switchTataliSubpage(adminState.activeSubpage || 'dashboard');
     } else {
       pinError.style.display = 'block';
     }
@@ -4292,7 +4292,7 @@ function renderSharedMobilesWidget() {
 
   const mobileGroups = {};
   appData.beneficiaries.forEach(b => {
-    const mob = b.mobile ? b.mobile.strip ? b.mobile.strip() : b.mobile.trim() : '';
+    const mob = b.mobile ? (typeof b.mobile === 'string' ? b.mobile.trim() : String(b.mobile)) : '';
     if (mob) {
       if (!mobileGroups[mob]) mobileGroups[mob] = [];
       mobileGroups[mob].push(b);

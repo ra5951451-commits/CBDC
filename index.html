@@ -38,10 +38,7 @@
         <button class="nav-item" data-tab="list-tab">📋 યાદી</button>
         <button class="nav-item" data-tab="process-tab">📲 સ્ટેપ</button>
         <button class="nav-item" data-tab="info-tab">ℹ️ માહિતી</button>
-        <button class="nav-item admin-nav-btn" data-tab="admin-tab">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon-inline" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: text-bottom;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          Tatali
-        </button>
+        <button class="nav-item admin-nav-btn" data-tab="admin-tab">🔑 તલાટી</button>
       </nav>
     </div>
   </header>
@@ -107,12 +104,12 @@
         </div>
         <div class="card-body">
           <div class="card-text-block">
-            <h3>🔍 પાત્રતા ચકાસો</h3>
+            <h3>પાત્રતા ચકાસો</h3>
             <p>CBDC લિસ્ટમાં તમારું નામ છે કે નહીં તે શોધો</p>
           </div>
           <div class="search-form">
-            <input type="text" id="quick-search-input" placeholder="🔎 નામ / કાર્ડ નં. શોધો..." aria-label="ઝડપી શોધ">
-            <button id="quick-search-btn" class="btn btn-primary">🔍 શોધો</button>
+            <input type="text" id="quick-search-input" placeholder="નામ અથવા રેશનકાર્ડ નંબર શોધો..." aria-label="ઝડપી શોધ">
+            <button id="quick-search-btn" class="btn btn-primary">શોધો</button>
           </div>
         </div>
       </div>
@@ -124,9 +121,9 @@
           <div class="action-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
           </div>
-          <h4>📋 પાત્ર યાદી</h4>
+          <h4>પાત્ર યાદી</h4>
           <p>લાભાર્થીઓનું સંપૂર્ણ લિસ્ટ</p>
-          <span class="action-link">જુઓ →</span>
+          <span class="action-link">યાદી જુઓ →</span>
         </div>
 
         <!-- Action: Process -->
@@ -134,9 +131,9 @@
           <div class="action-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
           </div>
-          <h4>📲 CBDC સ્ટેપ</h4>
+          <h4>CBDC સ્ટેપ</h4>
           <p>૨ સરળ પગલાંમાં પ્રક્રિયા સમજો</p>
-          <span class="action-link">જુઓ →</span>
+          <span class="action-link">પદ્ધતિ જુઓ →</span>
         </div>
       </div>
 
@@ -160,7 +157,7 @@
           <span class="search-icon-inside">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </span>
-          <input type="text" id="beneficiary-search" placeholder="🔎 નામ / કાર્ડ નં. શોધો..." aria-label="લાભાર્થી શોધો">
+          <input type="text" id="beneficiary-search" placeholder="નામ અથવા રેશનકાર્ડ નંબર વડે શોધો..." aria-label="લાભાર્થી શોધો">
           <button id="search-clear-btn" class="search-clear-btn" aria-label="શોધ સાફ કરો" style="display: none;">&times;</button>
         </div>
 
@@ -254,8 +251,7 @@
           </div>
           <div class="step-text-container">
             <h3>સ્ટેપ ૪:</h3>
-            <p>વપરાશકર્તાને એપ્લીકેશન પિન સેટ કરવાનોર રહેશે. જે એપમાં લોગ ઇન કરવા માટેની પદ્ધતિ છે.
-લાભાર્થીના મોબાઇલમાં પાસવર્ડ અથવા બાયોમેટ્રિક હોઈ તે જ સેટ કરવાનો રહેશે.</p>
+            <p>એપ્લીકેશન પિન અથવા બાયોમેટ્રિક પાસવર્ડ સેટ કરો.</p>
           </div>
         </div>
 
@@ -267,7 +263,7 @@
           </div>
           <div class="step-text-container">
             <h3>સ્ટેપ ૫:</h3>
-            <p>KYC પૂર્ણ કરવા માટે વપરાશકર્તાને તેનું CBDC વોલેટ બતાવવામાં આવશે.</p>
+            <p>KYC પૂર્ણ કરી તમારું CBDC વોલેટ શરૂ કરો.</p>
           </div>
         </div>
 
@@ -279,7 +275,7 @@
           </div>
           <div class="step-text-container">
             <h3>સ્ટેપ ૬:</h3>
-            <p>વોલેટ પિન સેટ કરો જે આંકડાકીય અને 6 અંકોનો હોય.જે લાભાર્થી યાદ રાખી શકે અને અન્ય કોઈ સાથે શેર ન કરે. જેનો ઉપયોગ ટ્રાન્ઝેક્શન અથવા વોલેટ પુનઃપ્રાપ્તિ સમયે કરવામાં આવશે.</p>
+            <p>૬ અંકોનો ગુપ્ત વોલેટ પિન સેટ કરો.</p>
           </div>
         </div>
 
@@ -291,7 +287,7 @@
           </div>
           <div class="step-text-container">
             <h3>સ્ટેપ ૭:</h3>
-            <p>આધાર પ્રમાણીકરણ માટે Continue પર ક્લિક કરવાનું રહેશે</p>
+            <p>આધાર પ્રમાણીકરણ માટે આગળ વધો.</p>
           </div>
         </div>
 
@@ -303,7 +299,7 @@
           </div>
           <div class="step-text-container">
             <h3>સ્ટેપ ૮:</h3>
-            <p>વપ્રમાણીકરણ(Authentication) પદ્ધતિ પસંદ કરો આધાર OTP દ્વારા નોંધણી પૂર્ણ કરો</p>
+            <p>આધાર OTP દ્વારા નોંધણી પૂર્ણ કરો.</p>
           </div>
         </div>
 
@@ -313,7 +309,7 @@
       <div class="video-container-card">
         <h4 class="video-heading">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="yt-icon" style="color: #ff0000; flex-shrink: 0;"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.507a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.87.507 9.388.507 9.388.507s7.518 0 9.388-.507a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-          ▶️ વિડીયો ગાઇડ જુઓ
+          વિડીયો માર્ગદર્શિકા જુઓ
         </h4>
         <a href="https://youtu.be/ppYai076W9Q?si=9ySXSYOA4RCYcTbz" target="_blank" class="video-play-link" rel="noopener" aria-label="વિડીયો ચાલુ કરો">
           <div class="video-thumbnail-wrapper">
@@ -351,7 +347,7 @@
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="info-card-icon" style="color: var(--accent-color); flex-shrink: 0; display: inline-block; vertical-align: middle; margin-right: 8px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
             પ્રક્રિયા કેવી રીતે ચાલે?
           </h3>
-          <p>e₹ રેશન વિતરણના ૦ પગલાં:</p>
+          <p>e₹ રેશન વિતરણના ૬ પગલાં:</p>
           <div class="mini-process-list">
             <div class="mini-step"><strong>૧. પસંદગી:</strong> NFSA પાત્ર કાર્ડ ધારકોની પસંદગી</div>
             <div class="mini-step"><strong>૨. વોલેટ:</strong> e₹ વોલેટ શરૂ કરો</div>
@@ -396,12 +392,12 @@
         <div class="info-section-card helpdesk-card">
           <h3>
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="info-card-icon" style="color: var(--success-color); flex-shrink: 0; display: inline-block; vertical-align: middle; margin-right: 8px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            📞 મદદ & સંપર્ક
+            મદદ અને સંપર્ક કેન્દ્ર
           </h3>
           <p>સહાય માટે સંપર્ક કરો:</p>
           <div class="contact-buttons-row">
             <a href="tel:1967" class="contact-btn call-btn">
-              <span>📞 હેલ્પલાઇન: <strong>૧૯૦૧</strong></span>
+              <span>📞 હેલ્પલાઇન: <strong>૧૯૬૭</strong></span>
             </a>
             <div class="helpdesk-details">
               <span>📍 પંચાયત ઓફિસ, પળી</span>
@@ -430,14 +426,14 @@
         <div class="admin-auth-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width: 52px; height: 52px; color: var(--primary-color);"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3>🔐 તલાટી લૉગિન</h3>
+        <h3>તલાટી લૉગિન</h3>
         <p>તમારું આઈડી અને પાસવર્ડ દાખલ કરો</p>
         <div class="admin-login-form">
           <div class="input-group">
-            <input type="text" id="admin-username-input" placeholder="👤 તલાટી આઈડી" aria-label="તલાટી આઈડી">
+            <input type="text" id="admin-username-input" placeholder="તલાટી આઈડી" aria-label="તલાટી આઈડી">
           </div>
           <div class="input-group">
-            <input type="password" id="admin-password-input" placeholder="🔒 પાસવર્ડ" aria-label="પાસવર્ડ">
+            <input type="password" id="admin-password-input" placeholder="પાસવર્ડ" aria-label="પાસવર્ડ">
           </div>
           <button id="admin-login-btn" class="btn btn-primary" style="width: 100%; margin-top: 6px;">➜ પ્રવેશ કરો</button>
         </div>
@@ -450,7 +446,7 @@
         <!-- Admin Action Header -->
         <div class="admin-action-bar">
           <div class="admin-user-info">
-            <span class="admin-badge">🔑 તલાટી</span>
+            <span class="admin-badge">તલાટી</span>
             <span class="last-sync-time" id="admin-last-sync">🟢 લાઈવ</span>
           </div>
           <div class="admin-actions-right">
@@ -461,16 +457,16 @@
 
         <!-- Tatali Multi-Subpage Tab Navigation Bar -->
         <div class="tatali-subnav-bar" id="tatali-subnav-bar">
-          <button class="tatali-subnav-btn active" data-tatali-page="dashboard">
+          <button class="tatali-subnav-btn active" data-tatali-page="dashboard" onclick="switchTataliSubpage('dashboard')">
             📊 ડેશબોર્ડ
           </button>
-          <button class="tatali-subnav-btn" data-tatali-page="status">
+          <button class="tatali-subnav-btn" data-tatali-page="status" onclick="switchTataliSubpage('status')">
             ⚙️ સ્ટેટસ
           </button>
-          <button class="tatali-subnav-btn" data-tatali-page="shared">
+          <button class="tatali-subnav-btn" data-tatali-page="shared" onclick="switchTataliSubpage('shared')">
             🔍 શેરિંગ
           </button>
-          <button class="tatali-subnav-btn" data-tatali-page="reports">
+          <button class="tatali-subnav-btn" data-tatali-page="reports" onclick="switchTataliSubpage('reports')">
             📁 અહેવાલ
           </button>
         </div>
