@@ -4013,8 +4013,9 @@ function performSearch(queryText, category) {
     });
   }
 
+  const clearBtn = document.getElementById('search-clear-btn');
   if (filterState.query !== "") {
-    clearSearchBtn.style.display = 'block';
+    if (clearBtn) clearBtn.style.display = 'block';
     const cleanQuery = filterState.query.replace(/\s+/g, '');
     result = result.filter(household => {
       const cardMatch = household.clean_ration_card.includes(cleanQuery) || household.ration_card.includes(filterState.query);
@@ -4024,7 +4025,7 @@ function performSearch(queryText, category) {
       return cardMatch || nameMatch;
     });
   } else {
-    clearSearchBtn.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = 'none';
   }
 
   filterState.filteredHouseholds = result;
@@ -4034,7 +4035,8 @@ function performSearch(queryText, category) {
 }
 
 function renderStats() {
-  resultsCount.textContent = `કુલ રેશન કાર્ડ: ${filterState.filteredHouseholds.length}`;
+  const elResultsCount = document.getElementById('results-count');
+  if (elResultsCount) elResultsCount.textContent = `કુલ રેશન કાર્ડ: ${filterState.filteredHouseholds.length}`;
   
   const homeBeneficiaries = document.getElementById('home-stat-beneficiaries');
   const homeHouseholds = document.getElementById('home-stat-households');
@@ -4044,7 +4046,7 @@ function renderStats() {
   if (homeBeneficiaries && appData.beneficiaries.length > 0) homeBeneficiaries.textContent = appData.beneficiaries.length;
   if (homeHouseholds && appData.households.length > 0) homeHouseholds.textContent = appData.households.length;
   if (homeShop) homeShop.textContent = "ભરતભાઈ બારોટ";
-  if (homeDate && appData.metadata.generated_on) homeDate.textContent = appData.metadata.generated_on.split(' ')[0];
+  if (homeDate && appData.metadata && appData.metadata.generated_on) homeDate.textContent = appData.metadata.generated_on.split(' ')[0];
 }
 
 function highlightMatch(text, query) {
@@ -4066,17 +4068,21 @@ function highlightMatch(text, query) {
    ========================================================================== */
 
 function renderList() {
-  listContainer.innerHTML = "";
+  const targetListContainer = document.getElementById('beneficiaries-list');
+  const targetLoadMoreContainer = document.getElementById('load-more-container');
+  if (!targetListContainer) return;
+
+  targetListContainer.innerHTML = "";
   
   if (filterState.filteredHouseholds.length === 0) {
-    listContainer.innerHTML = `
+    targetListContainer.innerHTML = `
       <div class="empty-state">
         <span class="empty-state-icon">🔍</span>
         <h4>કોઈ પરિણામ મળ્યું નથી</h4>
         <p>"${filterState.query}" અથવા પસંદ કરેલ ફિર્લ્ટર માટે કોઈ રેશન કાર્ડ મળ્યું નથી.</p>
       </div>
     `;
-    loadMoreContainer.style.display = 'none';
+    if (targetLoadMoreContainer) targetLoadMoreContainer.style.display = 'none';
     return;
   }
   
@@ -4131,30 +4137,41 @@ function renderList() {
       </div>
     `;
     
-    listContainer.appendChild(cardEl);
+    targetListContainer.appendChild(cardEl);
   });
   
-  if (filterState.filteredHouseholds.length > filterState.displayedCount) {
-    loadMoreContainer.style.display = 'flex';
-  } else {
-    loadMoreContainer.style.display = 'none';
+  if (targetLoadMoreContainer) {
+    if (filterState.filteredHouseholds.length > filterState.displayedCount) {
+      targetLoadMoreContainer.style.display = 'flex';
+    } else {
+      targetLoadMoreContainer.style.display = 'none';
+    }
   }
 }
 
-// Bind search & filter listeners
-if (searchInput) searchInput.addEventListener('input', (e) => { performSearch(e.target.value); });
-if (clearSearchBtn) clearSearchBtn.addEventListener('click', () => { searchInput.value = ""; performSearch(""); searchInput.focus(); });
-if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => { filterState.displayedCount += 15; renderList(); });
+function initSearchListeners() {
+  const elSearchInput = document.getElementById('beneficiary-search');
+  const elClearBtn = document.getElementById('search-clear-btn');
+  const elLoadMoreBtn = document.getElementById('load-more-btn');
+  const elFilterPillsContainer = document.getElementById('filter-pills-container');
 
-const filterPillsContainer = document.getElementById('filter-pills-container');
-if (filterPillsContainer) {
-  filterPillsContainer.addEventListener('click', (e) => {
-    const pill = e.target.closest('.filter-pill');
-    if (!pill) return;
-    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    performSearch(undefined, pill.getAttribute('data-filter'));
+  if (elSearchInput) elSearchInput.addEventListener('input', (e) => { performSearch(e.target.value); });
+  if (elClearBtn) elClearBtn.addEventListener('click', () => { 
+    if (elSearchInput) elSearchInput.value = ""; 
+    performSearch(""); 
+    if (elSearchInput) elSearchInput.focus(); 
   });
+  if (elLoadMoreBtn) elLoadMoreBtn.addEventListener('click', () => { filterState.displayedCount += 15; renderList(); });
+
+  if (elFilterPillsContainer) {
+    elFilterPillsContainer.addEventListener('click', (e) => {
+      const pill = e.target.closest('.filter-pill');
+      if (!pill) return;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      performSearch(undefined, pill.getAttribute('data-filter'));
+    });
+  }
 }
 
 /* ==========================================================================
@@ -4200,7 +4217,7 @@ function initAdminAuth() {
     showToast("🔒 તલાટી (Tatali) લૉગઆઉટ થયું.");
   });
 
-  if (exportBtn) exportBtn.addEventListener('click', exportUpdatedJSON);
+  if (exportBtn) exportBtn.addEventListener('click', openExportModal);
 
   // Tatali Subnav Bar click listener
   const subnavBar = document.getElementById('tatali-subnav-bar');
@@ -4811,14 +4828,17 @@ function showToast(msg) {
    ========================================================================== */
 
 function executeQuickSearch() {
-  const query = quickSearchInput.value;
+  const inputEl = document.getElementById('quick-search-input');
+  const mainSearchEl = document.getElementById('beneficiary-search');
+  const query = inputEl ? inputEl.value : "";
+
   if (query.trim() !== "") {
-    searchInput.value = query;
-    window.location.hash = '#list';
+    if (mainSearchEl) mainSearchEl.value = query;
+    switchTab('list-tab');
     performSearch(query);
-    quickSearchInput.value = "";
+    if (inputEl) inputEl.value = "";
   } else {
-    window.location.hash = '#list';
+    switchTab('list-tab');
   }
 }
 
@@ -4856,6 +4876,7 @@ function initLightbox() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initRouter();
+  initSearchListeners();
   loadData();
   initAdminAuth();
   initLightbox();
