@@ -3825,8 +3825,10 @@ let adminState = {
 };
 
 /* ==========================================================================
-   Instagram-Style Active Session ID Manager
+   30-Minute Persisted Admin Session Manager
    ========================================================================== */
+
+let adminSessionTimer = null;
 
 function generateSessionToken() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -3837,31 +3839,134 @@ function generateSessionToken() {
   return `SES-CBDC-${token}`;
 }
 
-function getOrCreateSessionId() {
-  let sessId = sessionStorage.getItem('cbdc_active_session_id');
-  if (!sessId) {
-    sessId = generateSessionToken();
-    sessionStorage.setItem('cbdc_active_session_id', sessId);
-    sessionStorage.setItem('cbdc_active_session_time', new Date().toISOString());
+function createAdminSession(username) {
+  const sessionId = generateSessionToken();
+  const now = Date.now();
+  const expiresAt = now + (30 * 60 * 1000); // 30 minutes in ms
+
+  const sessionData = {
+    sessionId: sessionId,
+    username: username || 'nikunjdarji',
+    createdAt: now,
+    expiresAt: expiresAt
+  };
+
+  try {
+    localStorage.setItem('cbdc_admin_session', JSON.stringify(sessionData));
+  } catch (e) {
+    console.error("Error saving admin session:", e);
   }
-  adminState.sessionId = sessId;
+
+  adminState.isAuthenticated = true;
+  adminState.sessionId = sessionId;
+
   updateSessionBadgeUI();
-  return sessId;
+  scheduleSessionExpiryTimer(expiresAt - now);
+  return sessionData;
+}
+
+function checkAndRestoreAdminSession() {
+  try {
+    const raw = localStorage.getItem('cbdc_admin_session');
+    if (!raw) return false;
+
+    const sessionData = JSON.parse(raw);
+    const now = Date.now();
+
+    if (!sessionData || !sessionData.expiresAt || now >= sessionData.expiresAt) {
+      destroyAdminSession('expired_on_load');
+      return false;
+    }
+
+    // Valid session within 30 minutes! Restore state directly
+    adminState.isAuthenticated = true;
+    adminState.sessionId = sessionData.sessionId;
+
+    updateSessionBadgeUI();
+    scheduleSessionExpiryTimer(sessionData.expiresAt - now);
+    return true;
+  } catch (e) {
+    console.error("Error restoring admin session:", e);
+    destroyAdminSession('error');
+    return false;
+  }
+}
+
+function destroyAdminSession(reason) {
+  if (adminSessionTimer) {
+    clearTimeout(adminSessionTimer);
+    adminSessionTimer = null;
+  }
+
+  const oldSession = adminState.sessionId;
+
+  try {
+    localStorage.removeItem('cbdc_admin_session');
+    sessionStorage.removeItem('cbdc_active_session_id');
+  } catch (e) {
+    console.error("Error removing admin session:", e);
+  }
+
+  adminState.isAuthenticated = false;
+  adminState.sessionId = "";
+
+  const authCard = document.getElementById('admin-auth-card');
+  const dashWrapper = document.getElementById('admin-dashboard-wrapper');
+
+  if (authCard) authCard.style.display = 'block';
+  if (dashWrapper) dashWrapper.style.display = 'none';
+
+  updateSessionBadgeUI();
+
+  if (reason === 'user_logout') {
+    showToast(`🔒 સેશન ${oldSession || ''} સંપૂર્ણ રીતે રદ થયું અને લોગઆઉટ થયા.`);
+  } else if (reason === 'expired' || reason === 'expired_on_load') {
+    showToast(`❌ ૩૦ મિનિટ પૂર્ણ થતાં સેશન સમાપ્ત થઈ ગયું છે. કૃપા કરીને ફરી લોગિન કરો.`);
+  }
+}
+
+function scheduleSessionExpiryTimer(msRemaining) {
+  if (adminSessionTimer) clearTimeout(adminSessionTimer);
+  if (msRemaining <= 0) {
+    destroyAdminSession('expired');
+    return;
+  }
+  adminSessionTimer = setTimeout(() => {
+    destroyAdminSession('expired');
+  }, msRemaining);
+}
+
+function getOrCreateSessionId() {
+  if (adminState.isAuthenticated && adminState.sessionId) {
+    return adminState.sessionId;
+  }
+  return generateSessionToken();
 }
 
 function renewSessionId() {
-  const newSessId = generateSessionToken();
-  sessionStorage.setItem('cbdc_active_session_id', newSessId);
-  sessionStorage.setItem('cbdc_active_session_time', new Date().toISOString());
-  adminState.sessionId = newSessId;
-  updateSessionBadgeUI();
-  return newSessId;
+  if (adminState.isAuthenticated) {
+    return createAdminSession(adminState.username).sessionId;
+  }
+  return generateSessionToken();
 }
 
 function updateSessionBadgeUI() {
   const badge = document.getElementById('admin-session-badge');
-  if (badge && adminState.sessionId) {
+  if (!badge) return;
+
+  if (adminState.isAuthenticated && adminState.sessionId) {
+    try {
+      const raw = localStorage.getItem('cbdc_admin_session');
+      if (raw) {
+        const s = JSON.parse(raw);
+        const minsLeft = Math.max(0, Math.ceil((s.expiresAt - Date.now()) / (60 * 1000)));
+        badge.textContent = `🔑 ${adminState.sessionId} (${minsLeft}મિ)`;
+        return;
+      }
+    } catch (e) {}
     badge.textContent = `🔑 ${adminState.sessionId}`;
+  } else {
+    badge.textContent = `🔑 SES-CBDC-INIT`;
   }
 }
 
@@ -4231,22 +4336,30 @@ function initAdminAuth() {
   const logoutBtn = document.getElementById('admin-logout-btn');
   const exportBtn = document.getElementById('admin-export-json-btn');
 
+  // Auto-restore 30-minute active session on refresh or browser re-open
+  const isRestored = checkAndRestoreAdminSession();
+  if (isRestored) {
+    if (authCard) authCard.style.display = 'none';
+    if (dashWrapper) dashWrapper.style.display = 'block';
+    if (pinError) pinError.style.display = 'none';
+    switchTataliSubpage(adminState.activeSubpage || 'dashboard');
+  }
+
   const attemptLogin = () => {
     const u = userInput ? userInput.value.trim() : '';
     const p = passInput ? passInput.value : '';
 
     if (u === adminState.username && p === adminState.password) {
-      adminState.isAuthenticated = true;
-      getOrCreateSessionId();
-      authCard.style.display = 'none';
-      dashWrapper.style.display = 'block';
-      pinError.style.display = 'none';
+      const sess = createAdminSession(u);
+      if (authCard) authCard.style.display = 'none';
+      if (dashWrapper) dashWrapper.style.display = 'block';
+      if (pinError) pinError.style.display = 'none';
       if (userInput) userInput.value = '';
       if (passInput) passInput.value = '';
-      showToast(`🔓 સ્વાગત છે nikunjdarji! તલાટી (Tatali) લૉગિન સફળ થયું. (${adminState.sessionId})`);
+      showToast(`🔓 સ્વાગત છે nikunjdarji! તલાટી લૉગિન સફળ થયું. (${sess.sessionId})`);
       switchTataliSubpage(adminState.activeSubpage || 'dashboard');
     } else {
-      pinError.style.display = 'block';
+      if (pinError) pinError.style.display = 'block';
     }
   };
 
@@ -4255,12 +4368,7 @@ function initAdminAuth() {
   if (passInput) passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
 
   if (logoutBtn) logoutBtn.addEventListener('click', () => {
-    const oldSession = adminState.sessionId;
-    adminState.isAuthenticated = false;
-    authCard.style.display = 'block';
-    dashWrapper.style.display = 'none';
-    renewSessionId();
-    showToast(`🔒 સેશન ${oldSession} સફળતાપૂર્વક સમાપ્ત થયું.`);
+    destroyAdminSession('user_logout');
   });
 
   if (exportBtn) exportBtn.addEventListener('click', openExportModal);
