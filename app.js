@@ -3852,8 +3852,17 @@ const tabHashMapping = {
 function initRouter() {
   window.addEventListener('hashchange', handleRoute);
   
-  if (!window.location.hash || !tabHashMapping[window.location.hash]) {
-    window.location.hash = '#home';
+  // Attach click handler to nav items dynamically
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const tabId = item.getAttribute('data-tab');
+      if (tabId) switchTab(tabId);
+    });
+  });
+
+  const initialHash = window.location.hash;
+  if (!initialHash || !tabHashMapping[initialHash]) {
+    switchTab('home-tab');
   } else {
     handleRoute();
   }
@@ -3862,19 +3871,23 @@ function initRouter() {
 function handleRoute() {
   const hash = window.location.hash;
   const activeTabId = tabHashMapping[hash] || 'home-tab';
-  
   switchTab(activeTabId);
 }
 
 function switchTab(tabId) {
-  tabs.forEach(tab => tab.classList.remove('active'));
-  
-  const activeTab = document.getElementById(tabId);
-  if (activeTab) {
-    activeTab.classList.add('active');
-  }
-  
-  navItems.forEach(item => {
+  if (!tabId) return;
+
+  // 1. Toggle tab sections
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    if (tab.id === tabId) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+  });
+
+  // 2. Toggle active state on all matching nav buttons (desktop & mobile)
+  document.querySelectorAll('.nav-item').forEach(item => {
     if (item.getAttribute('data-tab') === tabId) {
       item.classList.add('active');
     } else {
@@ -3882,31 +3895,34 @@ function switchTab(tabId) {
     }
   });
 
+  // 3. Sync URL hash without looping
+  const targetHash = Object.keys(tabHashMapping).find(key => tabHashMapping[key] === tabId);
+  if (targetHash && window.location.hash !== targetHash) {
+    if (history.pushState) {
+      history.pushState(null, null, targetHash);
+    } else {
+      window.location.hash = targetHash;
+    }
+  }
+
+  // 4. If admin tab & logged in, sync subpages
   if (tabId === 'admin-tab' && adminState.isAuthenticated) {
-    renderAdminDashboard();
+    switchTataliSubpage(adminState.activeSubpage || 'dashboard');
   }
 
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-navItems.forEach(item => {
-  item.addEventListener('click', () => {
-    const tabId = item.getAttribute('data-tab');
-    const targetHash = Object.keys(tabHashMapping).find(key => tabHashMapping[key] === tabId);
-    if (targetHash) {
-      window.location.hash = targetHash;
-    }
-  });
-});
+window.switchTab = switchTab;
 
 const actionListBtn = document.getElementById('action-go-to-list');
-if (actionListBtn) actionListBtn.addEventListener('click', () => { window.location.hash = '#list'; });
+if (actionListBtn) actionListBtn.addEventListener('click', () => { switchTab('list-tab'); });
 
 const actionProcessBtn = document.getElementById('action-go-to-process');
-if (actionProcessBtn) actionProcessBtn.addEventListener('click', () => { window.location.hash = '#process'; });
+if (actionProcessBtn) actionProcessBtn.addEventListener('click', () => { switchTab('process-tab'); });
 
 const infoProcessBtn = document.getElementById('info-btn-to-process');
-if (infoProcessBtn) infoProcessBtn.addEventListener('click', () => { window.location.hash = '#process'; });
+if (infoProcessBtn) infoProcessBtn.addEventListener('click', () => { switchTab('process-tab'); });
 
 /* ==========================================================================
    2. Data Loading & LocalStorage Persistence
