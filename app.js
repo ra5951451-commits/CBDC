@@ -3819,8 +3819,51 @@ let adminState = {
   password: "Nikunj@97",
   searchQuery: "",
   filterStatus: "ALL",
+  activeSubpage: "dashboard",
+  sessionId: "",
   onboardingOverrides: {}
 };
+
+/* ==========================================================================
+   Instagram-Style Active Session ID Manager
+   ========================================================================== */
+
+function generateSessionToken() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let token = '';
+  for (let i = 0; i < 8; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return `SES-CBDC-${token}`;
+}
+
+function getOrCreateSessionId() {
+  let sessId = sessionStorage.getItem('cbdc_active_session_id');
+  if (!sessId) {
+    sessId = generateSessionToken();
+    sessionStorage.setItem('cbdc_active_session_id', sessId);
+    sessionStorage.setItem('cbdc_active_session_time', new Date().toISOString());
+  }
+  adminState.sessionId = sessId;
+  updateSessionBadgeUI();
+  return sessId;
+}
+
+function renewSessionId() {
+  const newSessId = generateSessionToken();
+  sessionStorage.setItem('cbdc_active_session_id', newSessId);
+  sessionStorage.setItem('cbdc_active_session_time', new Date().toISOString());
+  adminState.sessionId = newSessId;
+  updateSessionBadgeUI();
+  return newSessId;
+}
+
+function updateSessionBadgeUI() {
+  const badge = document.getElementById('admin-session-badge');
+  if (badge && adminState.sessionId) {
+    badge.textContent = `🔑 ${adminState.sessionId}`;
+  }
+}
 
 // DOM Elements
 const tabs = document.querySelectorAll('.tab-content');
@@ -4194,12 +4237,13 @@ function initAdminAuth() {
 
     if (u === adminState.username && p === adminState.password) {
       adminState.isAuthenticated = true;
+      getOrCreateSessionId();
       authCard.style.display = 'none';
       dashWrapper.style.display = 'block';
       pinError.style.display = 'none';
       if (userInput) userInput.value = '';
       if (passInput) passInput.value = '';
-      showToast("🔓 સ્વાગત છે nikunjdarji! તલાટી (Tatali) લૉગિન સફળ થયું.");
+      showToast(`🔓 સ્વાગત છે nikunjdarji! તલાટી (Tatali) લૉગિન સફળ થયું. (${adminState.sessionId})`);
       switchTataliSubpage(adminState.activeSubpage || 'dashboard');
     } else {
       pinError.style.display = 'block';
@@ -4211,10 +4255,12 @@ function initAdminAuth() {
   if (passInput) passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') attemptLogin(); });
 
   if (logoutBtn) logoutBtn.addEventListener('click', () => {
+    const oldSession = adminState.sessionId;
     adminState.isAuthenticated = false;
     authCard.style.display = 'block';
     dashWrapper.style.display = 'none';
-    showToast("🔒 તલાટી (Tatali) લૉગઆઉટ થયું.");
+    renewSessionId();
+    showToast(`🔒 સેશન ${oldSession} સફળતાપૂર્વક સમાપ્ત થયું.`);
   });
 
   if (exportBtn) exportBtn.addEventListener('click', openExportModal);
@@ -4739,6 +4785,7 @@ function generatePDFExport(data, filterType) {
       </div>
       <div style="text-align: right; font-size: 12px; color: #64748b;">
         <div><strong>તારીખ:</strong> ${dateStr} ${timeStr}</div>
+        <div><strong>સેશન ID:</strong> ${adminState.sessionId || getOrCreateSessionId()}</div>
         <div><strong>રિપોર્ટ:</strong> ${filterLabel}</div>
         <div><strong>કુલ નોંધણી:</strong> ${data.length}</div>
       </div>
@@ -4875,6 +4922,7 @@ function initLightbox() {
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  getOrCreateSessionId();
   initRouter();
   initSearchListeners();
   loadData();
