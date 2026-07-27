@@ -21,15 +21,26 @@ module.exports = async function handler(req, res) {
     const allSrNos = await sMembers(KEYS.BENEFICIARIES_ALL);
     const overrides = {};
 
-    for (const srNoStr of allSrNos) {
+    const overridePromises = allSrNos.map(async (srNoStr) => {
       const srNo = Number(srNoStr);
       const override = await getJSON(KEYS.ONBOARDING(srNo));
       if (override) {
-        overrides[srNo] = {
-          onboarded: override.onboarded,
-          rc_onboarded: override.rc_onboarded,
-          version: override.version || 0,
+        return {
+          srNo,
+          data: {
+            onboarded: override.onboarded,
+            rc_onboarded: override.rc_onboarded,
+            version: override.version || 0,
+          },
         };
+      }
+      return null;
+    });
+
+    const results = await Promise.all(overridePromises);
+    for (const resItem of results) {
+      if (resItem) {
+        overrides[resItem.srNo] = resItem.data;
       }
     }
 
