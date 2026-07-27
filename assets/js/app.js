@@ -4114,8 +4114,9 @@ function startAutoRefresh() {
           groupHouseholds();
           renderStats();
           renderList();
-          renderAdminDashboard();
         }
+        // Always render dashboard to update live sync timestamp badge and KPI counters
+        renderAdminDashboard();
       }
     } catch (e) {
       console.warn('5s smart sync failed:', e.message);
@@ -4726,6 +4727,12 @@ function renderAdminDashboard() {
   if (kpiOnboarded) kpiOnboarded.textContent = onboardedMembers;
   if (kpiProgress) kpiProgress.style.width = `${onboardedPercent}%`;
   if (kpiPercent) kpiPercent.textContent = `${onboardedPercent}% પૂર્ણ થયું (${totalMembers - onboardedMembers} પેન્ડિંગ)`;
+
+  const lastSyncBadge = document.getElementById('admin-last-sync');
+  if (lastSyncBadge) {
+    const timeStr = new Date().toLocaleTimeString('gu-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    lastSyncBadge.textContent = `🟢 લાઈવ (${timeStr})`;
+  }
 
   renderSharedMobilesWidget();
   renderFamilyBreakdownWidget();
