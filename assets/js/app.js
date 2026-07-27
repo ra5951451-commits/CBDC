@@ -3794,6 +3794,94 @@ const EMBEDDED_DATA = {
    Pali Gram Panchayat
    ========================================================================== */
 
+/* ==========================================================================
+   Backend API Client — communicates with Vercel Serverless Functions
+   ========================================================================== */
+
+const ApiClient = {
+  BASE: '/api',
+  token: null,
+
+  /**
+   * Set the JWT token (stored in memory, not localStorage for security).
+   * localStorage is used only for session restore across page reloads.
+   */
+  setToken(token) {
+    this.token = token;
+    try { localStorage.setItem('cbdc_jwt', token); } catch (e) {}
+  },
+
+  clearToken() {
+    this.token = null;
+    try { localStorage.removeItem('cbdc_jwt'); } catch (e) {}
+  },
+
+  restoreToken() {
+    try {
+      const saved = localStorage.getItem('cbdc_jwt');
+      if (saved) this.token = saved;
+    } catch (e) {}
+  },
+
+  async request(method, path, body) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (this.token) headers['Authorization'] = `Bearer ${this.token}`;
+
+    const opts = { method, headers };
+    if (body && method !== 'GET') opts.body = JSON.stringify(body);
+
+    const res = await fetch(`${this.BASE}${path}`, opts);
+    const data = await res.json();
+
+    if (!res.ok) {
+      const err = new Error(data.error || `API error ${res.status}`);
+      err.status = res.status;
+      err.data = data;
+      throw err;
+    }
+    return data;
+  },
+
+  login(username, password) {
+    return this.request('POST', '/auth/login', { username, password });
+  },
+
+  logout() {
+    return this.request('POST', '/auth/logout');
+  },
+
+  getMe() {
+    return this.request('GET', '/auth/me');
+  },
+
+  getBeneficiaries(status) {
+    const qs = status ? `?status=${status}` : '';
+    return this.request('GET', `/beneficiaries${qs}`);
+  },
+
+  getBeneficiary(srNo) {
+    return this.request('GET', `/beneficiaries/${srNo}`);
+  },
+
+  updateOnboarding(srNo, field, status, version, remarks) {
+    return this.request('PATCH', `/beneficiaries/${srNo}/onboarding`, {
+      field, status, version, remarks: remarks || ''
+    });
+  },
+
+  getDashboard() {
+    return this.request('GET', '/dashboard');
+  },
+
+  getAudit(limit) {
+    return this.request('GET', `/audit?limit=${limit || 20}`);
+  },
+
+  getSyncLatest() {
+    return this.request('GET', '/sync/latest');
+  }
+};
+
 // Global State
 let appData = {
   metadata: {
@@ -3815,14 +3903,20 @@ let filterState = {
 
 let adminState = {
   isAuthenticated: false,
-  username: "nikunjdarji",
-  password: "Nikunj@97",
+  username: "",
   searchQuery: "",
   filterStatus: "ALL",
   activeSubpage: "dashboard",
   sessionId: "",
-  onboardingOverrides: {}
+  onboardingOverrides: {},
+  versions: {}
 };
+
+/** Flag: true when data was loaded from the backend API (not local JSON/embedded) */
+let dataFromApi = false;
+
+/** Auto-refresh interval handle */
+let autoRefreshInterval = null;
 
 /* ==========================================================================
    30-Minute Persisted Admin Session Manager
@@ -3839,14 +3933,22 @@ function generateSessionToken() {
   return `SES-CBDC-${token}`;
 }
 
-function createAdminSession(username) {
+/**
+ * Create a session after successful API login.
+ * @param {string} token - JWT from the backend
+ * @param {{ id: string, username: string, role: string, district?: string }} user
+ */
+function createAdminSession(token, user) {
   const sessionId = generateSessionToken();
   const now = Date.now();
   const expiresAt = now + (30 * 60 * 1000); // 30 minutes in ms
 
+  // Store JWT for cross-reload persistence
+  ApiClient.setToken(token);
+
   const sessionData = {
     sessionId: sessionId,
-    username: username || 'nikunjdarji',
+    username: user.username || '',
     createdAt: now,
     expiresAt: expiresAt
   };
@@ -3858,15 +3960,22 @@ function createAdminSession(username) {
   }
 
   adminState.isAuthenticated = true;
+  adminState.username = user.username || '';
   adminState.sessionId = sessionId;
 
   updateSessionBadgeUI();
   scheduleSessionExpiryTimer(expiresAt - now);
+  startAutoRefresh();
   return sessionData;
 }
 
-function checkAndRestoreAdminSession() {
+/**
+ * Restore session on page load: read JWT from localStorage, validate via /api/auth/me.
+ * @returns {Promise<boolean>}
+ */
+async function checkAndRestoreAdminSession() {
   try {
+    // First check if localStorage session is still within 30 minutes
     const raw = localStorage.getItem('cbdc_admin_session');
     if (!raw) return false;
 
@@ -3878,13 +3987,28 @@ function checkAndRestoreAdminSession() {
       return false;
     }
 
-    // Valid session within 30 minutes! Restore state directly
-    adminState.isAuthenticated = true;
-    adminState.sessionId = sessionData.sessionId;
+    // Restore JWT token from localStorage
+    ApiClient.restoreToken();
+    if (!ApiClient.token) {
+      destroyAdminSession('expired_on_load');
+      return false;
+    }
 
-    updateSessionBadgeUI();
-    scheduleSessionExpiryTimer(sessionData.expiresAt - now);
-    return true;
+    // Validate token with backend
+    try {
+      const user = await ApiClient.getMe();
+      adminState.isAuthenticated = true;
+      adminState.username = user.username || sessionData.username || '';
+      adminState.sessionId = sessionData.sessionId;
+      updateSessionBadgeUI();
+      scheduleSessionExpiryTimer(sessionData.expiresAt - now);
+      startAutoRefresh();
+      return true;
+    } catch (apiErr) {
+      console.warn('Session validation failed, clearing session:', apiErr.message);
+      destroyAdminSession('expired_on_load');
+      return false;
+    }
   } catch (e) {
     console.error("Error restoring admin session:", e);
     destroyAdminSession('error');
@@ -3898,7 +4022,16 @@ function destroyAdminSession(reason) {
     adminSessionTimer = null;
   }
 
+  stopAutoRefresh();
+
   const oldSession = adminState.sessionId;
+
+  // Try to invalidate session on backend (fire-and-forget)
+  if (reason === 'user_logout' && ApiClient.token) {
+    ApiClient.logout().catch(() => {});
+  }
+
+  ApiClient.clearToken();
 
   try {
     localStorage.removeItem('cbdc_admin_session');
@@ -3908,7 +4041,9 @@ function destroyAdminSession(reason) {
   }
 
   adminState.isAuthenticated = false;
+  adminState.username = "";
   adminState.sessionId = "";
+  dataFromApi = false;
 
   const authCard = document.getElementById('admin-auth-card');
   const dashWrapper = document.getElementById('admin-dashboard-wrapper');
@@ -3934,6 +4069,30 @@ function scheduleSessionExpiryTimer(msRemaining) {
   adminSessionTimer = setTimeout(() => {
     destroyAdminSession('expired');
   }, msRemaining);
+}
+
+/** Start auto-refresh: re-sync data from server every 60 seconds when admin tab is active */
+function startAutoRefresh() {
+  stopAutoRefresh();
+  autoRefreshInterval = setInterval(async () => {
+    if (!adminState.isAuthenticated || !ApiClient.token) return;
+    // Only refresh if admin tab is visible
+    const adminTab = document.getElementById('admin-tab');
+    if (!adminTab || !adminTab.classList.contains('active')) return;
+    try {
+      await loadDataFromAPI();
+      renderAdminDashboard();
+    } catch (e) {
+      console.warn('Auto-refresh failed:', e.message);
+    }
+  }, 15000); // 15-second sync — near-real-time multi-device updates
+}
+
+function stopAutoRefresh() {
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+    autoRefreshInterval = null;
+  }
 }
 
 function getOrCreateSessionId() {
@@ -4092,26 +4251,62 @@ function loadOnboardingOverrides() {
   }
 }
 
+/**
+ * Load data from backend API. Updates appData and version tracking.
+ * @returns {Promise<boolean>} true if API data was loaded successfully
+ */
+async function loadDataFromAPI() {
+  if (!adminState.isAuthenticated || !ApiClient.token) return false;
+  try {
+    const apiData = await ApiClient.getBeneficiaries();
+    appData.metadata = apiData.metadata || appData.metadata;
+    appData.beneficiaries = apiData.beneficiaries || [];
+    // Track versions for conflict detection
+    apiData.beneficiaries.forEach(b => {
+      adminState.versions[b.sr_no] = b.version || 0;
+    });
+    dataFromApi = true;
+    return true;
+  } catch (e) {
+    console.warn('API data fetch failed:', e.message);
+    return false;
+  }
+}
+
 async function loadData() {
   let data = null;
-  try {
-    const response = await fetch('data.json');
-    if (response.ok) {
-      data = await response.json();
+
+  // If authenticated, try backend API first
+  if (adminState.isAuthenticated && ApiClient.token) {
+    const apiLoaded = await loadDataFromAPI();
+    if (apiLoaded) {
+      data = { metadata: appData.metadata, beneficiaries: appData.beneficiaries };
     }
-  } catch (e) {
-    console.warn("fetch('data.json') failed or running on file:// scheme. Using embedded database fallback.", e);
   }
 
+  // Fallback: fetch local JSON or use embedded data
   if (!data) {
-    data = EMBEDDED_DATA;
-  }
+    try {
+      const response = await fetch('assets/data/data.json');
+      if (response.ok) {
+        data = await response.json();
+      }
+    } catch (e) {
+      console.warn("fetch('assets/data/data.json') failed or running on file:// scheme. Using embedded database fallback.", e);
+    }
 
-  appData.metadata = data.metadata;
-  appData.beneficiaries = data.beneficiaries;
-  
-  // Apply localStorage overrides
-  loadOnboardingOverrides();
+    if (!data) {
+      data = EMBEDDED_DATA;
+    }
+
+    appData.metadata = data.metadata;
+    appData.beneficiaries = data.beneficiaries;
+
+    // Apply localStorage overrides only when NOT using API data
+    if (!dataFromApi) {
+      loadOnboardingOverrides();
+    }
+  }
 
   // Group into households
   groupHouseholds();
@@ -4337,29 +4532,57 @@ function initAdminAuth() {
   const exportBtn = document.getElementById('admin-export-json-btn');
 
   // Auto-restore 30-minute active session on refresh or browser re-open
-  const isRestored = checkAndRestoreAdminSession();
-  if (isRestored) {
-    if (authCard) authCard.style.display = 'none';
-    if (dashWrapper) dashWrapper.style.display = 'block';
-    if (pinError) pinError.style.display = 'none';
-    switchTataliSubpage(adminState.activeSubpage || 'dashboard');
-  }
-
-  const attemptLogin = () => {
-    const u = userInput ? userInput.value.trim() : '';
-    const p = passInput ? passInput.value : '';
-
-    if (u === adminState.username && p === adminState.password) {
-      const sess = createAdminSession(u);
+  checkAndRestoreAdminSession().then(isRestored => {
+    if (isRestored) {
       if (authCard) authCard.style.display = 'none';
       if (dashWrapper) dashWrapper.style.display = 'block';
       if (pinError) pinError.style.display = 'none';
+      // Reload data from API after session restore
+      loadData().then(() => {
+        switchTataliSubpage(adminState.activeSubpage || 'dashboard');
+      });
+    }
+  });
+
+  const attemptLogin = async () => {
+    const u = userInput ? userInput.value.trim() : '';
+    const p = passInput ? passInput.value : '';
+
+    if (!u || !p) {
+      if (pinError) pinError.style.display = 'block';
+      return;
+    }
+
+    // Disable button during API call
+    if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '⏳ લોડ થઈ રહ્યું...'; }
+    if (pinError) pinError.style.display = 'none';
+
+    try {
+      const result = await ApiClient.login(u, p);
+      const sess = createAdminSession(result.token, result.user);
+
+      if (authCard) authCard.style.display = 'none';
+      if (dashWrapper) dashWrapper.style.display = 'block';
       if (userInput) userInput.value = '';
       if (passInput) passInput.value = '';
-      showToast(`🔓 સ્વાગત છે nikunjdarji! તલાટી લૉગિન સફળ થયું. (${sess.sessionId})`);
+
+      showToast(`🔓 સ્વાગત છે ${result.user.username}! તલાટી લૉગિન સફળ થયું. (${sess.sessionId})`);
+
+      // Load data from backend API
+      await loadData();
       switchTataliSubpage(adminState.activeSubpage || 'dashboard');
-    } else {
-      if (pinError) pinError.style.display = 'block';
+    } catch (err) {
+      console.error('Login failed:', err.message);
+      if (pinError) {
+        pinError.style.display = 'block';
+        if (err.status === 429) {
+          pinError.textContent = '⏳ ઘણા વધુ પ્રયાસ. કૃપા કરીને થોડી વાર પછી ફરી પ્રયત્ન કરો.';
+        } else {
+          pinError.textContent = '❌ ખોટો આઈડી/પાસવર્ડ';
+        }
+      }
+    } finally {
+      if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '➜ પ્રવેશ કરો'; }
     }
   };
 
@@ -4598,16 +4821,20 @@ function renderAdminTable() {
   }
 
   if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--text-light);">કોઈ પરિણામ મળ્યું નથી.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 20px; color: var(--text-light);">કોઈ પરિણામ મળ્યું નથી.</td></tr>`;
     return;
   }
 
   let html = "";
   list.forEach(b => {
-    const isChecked = b.onboarded === "Yes" ? "checked" : "";
-    const statusTag = b.onboarded === "Yes" 
+    const isOnboarded = b.onboarded === "Yes";
+    const isRcOnboarded = b.rc_onboarded === "Yes";
+    const statusTag = isOnboarded 
       ? `<span class="onboarded-tag yes">✓ ઓનબોર્ડેડ</span>` 
       : `<span class="onboarded-tag no">⏳ પેન્ડિંગ</span>`;
+    const rcStatusTag = isRcOnboarded
+      ? `<span class="onboarded-tag yes">✓ RC</span>`
+      : `<span class="onboarded-tag no">⏳ RC</span>`;
 
     html += `
       <tr>
@@ -4620,7 +4847,16 @@ function renderAdminTable() {
         <td>
           <div class="status-toggle-wrapper">
             <label class="toggle-switch">
-              <input type="checkbox" ${isChecked} onchange="toggleBeneficiaryStatus(${b.sr_no})">
+              <input type="checkbox" ${isOnboarded ? 'checked' : ''} onchange="toggleBeneficiaryStatus(${b.sr_no}, 'onboarded')">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </td>
+        <td>${rcStatusTag}</td>
+        <td>
+          <div class="status-toggle-wrapper">
+            <label class="toggle-switch">
+              <input type="checkbox" ${isRcOnboarded ? 'checked' : ''} onchange="toggleBeneficiaryStatus(${b.sr_no}, 'rc_onboarded')">
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -4632,28 +4868,67 @@ function renderAdminTable() {
   tbody.innerHTML = html;
 }
 
-function toggleBeneficiaryStatus(srNo) {
+/**
+ * Toggle beneficiary onboarding status via backend API.
+ * Uses optimistic UI update with conflict detection.
+ * @param {number} srNo - Beneficiary serial number
+ * @param {string} [field='onboarded'] - 'onboarded' or 'rc_onboarded'
+ */
+async function toggleBeneficiaryStatus(srNo, field = 'onboarded') {
   const beneficiary = appData.beneficiaries.find(b => b.sr_no === srNo);
   if (!beneficiary) return;
 
-  const newStatus = beneficiary.onboarded === "Yes" ? "No" : "Yes";
-  beneficiary.onboarded = newStatus;
-  adminState.onboardingOverrides[srNo] = newStatus;
+  const currentStatus = beneficiary[field];
+  const newStatus = currentStatus === "Yes" ? "No" : "Yes";
+  const currentVersion = adminState.versions[srNo] || 0;
 
-  try {
-    localStorage.setItem('cbdc_onboarding_overrides', JSON.stringify(adminState.onboardingOverrides));
-  } catch (e) {
-    console.error("Error saving overrides:", e);
-  }
-
-  showToast(newStatus === "Yes" 
-    ? `✅ ${beneficiary.name} — ઓનબોર્ડ સફળતાપૂર્વક અપડેટ થયું!` 
-    : `⏳ ${beneficiary.name} — પેન્ડિંગ સેટ થયું!`);
-
+  // Optimistic UI update
+  beneficiary[field] = newStatus;
   groupHouseholds();
   renderStats();
   renderList();
   renderAdminDashboard();
+
+  // If we have API access, send update to backend
+  if (adminState.isAuthenticated && ApiClient.token) {
+    try {
+      const result = await ApiClient.updateOnboarding(srNo, field, newStatus, currentVersion);
+      // Update local version tracker
+      adminState.versions[srNo] = result.version;
+
+      const fieldLabel = field === 'rc_onboarded' ? 'RC ઓનબોર્ડિંગ' : 'ઓનબોર્ડિંગ';
+      showToast(newStatus === "Yes"
+        ? `✅ ${beneficiary.name} — ${fieldLabel} સફળતાપૂર્વક અપડેટ થયું!`
+        : `⏳ ${beneficiary.name} — ${fieldLabel} પેન્ડિંગ સેટ થયું!`);
+    } catch (err) {
+      if (err.status === 409) {
+        // Version conflict — another device updated this record
+        showToast(`⚠️ ${beneficiary.name} — બીજા ડિવાઇસથી અપડેટ થયું છે. રીલોડ થઈ રહ્યું...`);
+        // Refetch all data to get the latest state
+        await loadData();
+        renderAdminDashboard();
+      } else {
+        // API error — revert optimistic update
+        beneficiary[field] = currentStatus;
+        groupHouseholds();
+        renderStats();
+        renderList();
+        renderAdminDashboard();
+        showToast(`❌ અપડેટ ફેઈલ થયું. ફરી પ્રયત્ન કરો.`);
+      }
+    }
+  } else {
+    // Fallback: save to localStorage (offline mode)
+    adminState.onboardingOverrides[srNo] = newStatus;
+    try {
+      localStorage.setItem('cbdc_onboarding_overrides', JSON.stringify(adminState.onboardingOverrides));
+    } catch (e) {
+      console.error("Error saving overrides:", e);
+    }
+    showToast(newStatus === "Yes"
+      ? `✅ ${beneficiary.name} — ઓનબોર્ડ સફળતાપૂર્વક! (ઓફલાઇન)`
+      : `⏳ ${beneficiary.name} — પેન્ડિંગ સેટ થયું! (ઓફલાઇન)`);
+  }
 }
 
 /* ==========================================================================

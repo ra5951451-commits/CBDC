@@ -9,15 +9,43 @@ A mobile-first, static website designed for **પળી ગ્રામ પં�
 
 1. **મુખ્ય પાનું (Home):** Welcome banner, quick action tiles, and a **Quick Eligibility Search Card** pre-filling filters.
 2. **પાત્ર યાદી (Beneficiary Whitelist):** Grouped household view indexing family members under a single card block, case-insensitive search by name or ration card number, gold text-highlighting, and lazy loading (15 households per page).
-3. **CBDC કરવાના સ્ટેપ (Process):** Side-by-side alternating process step images (`step1.jpg` to `step8.jpg`) and description text, plus a responsive embedded YouTube video guide.
+3. **CBDC કરવાના સ્ટેપ (Process):** Side-by-side alternating process step images (`assets/images/steps/step1.jpg` to `step8.jpg`) and description text, plus a responsive embedded YouTube video guide.
 4. **માહિતી (More Info):** A simple, scrollable informational layout answering FAQs and describing the 6-step government process flow.
+
+---
+
+## 📁 Folder Structure
+
+```
+CBDC/
+├── assets/                       # Public static assets
+│   ├── css/
+│   │   └── style.css             # Stylesheet
+│   ├── js/
+│   │   └── app.js                # Core JavaScript controller logic
+│   ├── data/
+│   │   └── data.json             # Compiled static database
+│   └── images/
+│       ├── logo_web.png          # Header brand logo
+│       ├── Logo.png              # Primary logo mark
+│       └── steps/                # Onboarding guide screenshots (step1.jpg - step8.jpg)
+├── docs/                         # Documentation & raw source files
+│   ├── pdfs/                     # PDF guidelines
+│   ├── raw_data/                 # Original Excel data sources
+│   └── design/                   # UI design drafts
+├── archive/                      # Historical / non-production data
+├── index.html                    # Main website application entry point
+├── vercel.json                   # Vercel deployment headers & configuration
+├── .gitignore                    # Git ignore file
+└── README.md                     # Project overview & documentation
+```
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Frontend:** HTML5, CSS3 (variables, transitions, custom HSL palette), Vanilla Javascript.
-- **Database:** `data.json` (compiled static database containing whitelist beneficiaries and generation metadata).
+- **Frontend:** HTML5, CSS3 (variables, transitions, custom HSL palette), Vanilla Javascript (`assets/js/app.js`).
+- **Database:** `assets/data/data.json` (compiled static database containing whitelist beneficiaries and generation metadata).
 - **Icons:** SVG vector graphics.
 - **Typography:** Google Fonts (`Outfit` for numerical listings, `Noto Sans Gujarati` for Gujarati text).
 

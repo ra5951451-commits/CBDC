@@ -1,1 +1,10 @@
-beneficiaries.json
+**/beneficiaries.json
+
+# Environment variables (contains secrets)
+.env
+
+# Dependencies
+node_modules/
+
+# Vercel
+.vercel/
