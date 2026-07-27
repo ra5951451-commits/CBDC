@@ -27,21 +27,17 @@ module.exports = async function handler(req, res) {
     // Fetch metadata
     const metadata = await getJSON(KEYS.METADATA) || {};
 
-    // Fetch all beneficiaries + their onboarding overrides
-    const beneficiaries = [];
-    let onboardedCount = 0;
-    let rcOnboardedCount = 0;
-
-    // Sort sr_no values numerically
+    // Fetch all beneficiaries + their onboarding overrides in parallel
     const sortedSrNos = allSrNos.map(Number).sort((a, b) => a - b);
 
-    for (const srNo of sortedSrNos) {
-      const base = await getJSON(KEYS.BENEFICIARY(srNo));
-      if (!base) continue;
+    const beneficiaryPromises = sortedSrNos.map(async (srNo) => {
+      const [base, override] = await Promise.all([
+        getJSON(KEYS.BENEFICIARY(srNo)),
+        getJSON(KEYS.ONBOARDING(srNo)),
+      ]);
 
-      const override = await getJSON(KEYS.ONBOARDING(srNo));
+      if (!base) return null;
 
-      // Merge override into base
       const merged = { ...base };
       if (override) {
         if (override.onboarded !== undefined) merged.onboarded = override.onboarded;
@@ -56,9 +52,18 @@ module.exports = async function handler(req, res) {
         merged.updatedBy = null;
         merged.remarks = '';
       }
+      return merged;
+    });
 
+    const rawBeneficiaries = await Promise.all(beneficiaryPromises);
+
+    const beneficiaries = [];
+    let onboardedCount = 0;
+    let rcOnboardedCount = 0;
+
+    for (const merged of rawBeneficiaries) {
+      if (!merged) continue;
       beneficiaries.push(merged);
-
       if (merged.onboarded === 'Yes') onboardedCount++;
       if (merged.rc_onboarded === 'Yes') rcOnboardedCount++;
     }

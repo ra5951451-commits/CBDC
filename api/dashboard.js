@@ -28,25 +28,29 @@ module.exports = async function handler(req, res) {
     const allSrNos = await sMembers(KEYS.BENEFICIARIES_ALL);
     const total = allSrNos.length;
 
+    const itemsPromises = allSrNos.map(async (srNoStr) => {
+      const srNo = Number(srNoStr);
+      const [base, override] = await Promise.all([
+        getJSON(KEYS.BENEFICIARY(srNo)),
+        getJSON(KEYS.ONBOARDING(srNo)),
+      ]);
+      if (!base) return null;
+      const onboarded = override?.onboarded || base.onboarded;
+      const rcOnboarded = override?.rc_onboarded || base.rc_onboarded;
+      return { rationCard: base.ration_card, onboarded, rcOnboarded };
+    });
+
+    const items = await Promise.all(itemsPromises);
+
     let onboardedCount = 0;
     let rcOnboardedCount = 0;
     const rationCards = new Set();
 
-    for (const srNoStr of allSrNos) {
-      const srNo = Number(srNoStr);
-      const base = await getJSON(KEYS.BENEFICIARY(srNo));
-      if (!base) continue;
-
-      // Track unique ration cards
-      if (base.ration_card) rationCards.add(base.ration_card);
-
-      // Merge override
-      const override = await getJSON(KEYS.ONBOARDING(srNo));
-      const onboarded = override?.onboarded || base.onboarded;
-      const rcOnboarded = override?.rc_onboarded || base.rc_onboarded;
-
-      if (onboarded === 'Yes') onboardedCount++;
-      if (rcOnboarded === 'Yes') rcOnboardedCount++;
+    for (const item of items) {
+      if (!item) continue;
+      if (item.rationCard) rationCards.add(item.rationCard);
+      if (item.onboarded === 'Yes') onboardedCount++;
+      if (item.rcOnboarded === 'Yes') rcOnboardedCount++;
     }
 
     // ── Get recent activity ──────────────────────────────────────────────────
