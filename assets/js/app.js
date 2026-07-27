@@ -4073,53 +4073,23 @@ function scheduleSessionExpiryTimer(msRemaining) {
 
 let lastSyncTimestamp = null;
 
-/** Start smart 5-second auto-refresh: lightweight sync every 5 seconds when admin tab is active */
+/** Start 5-second auto-refresh: re-sync full data from server every 5 seconds */
 function startAutoRefresh() {
   stopAutoRefresh();
   autoRefreshInterval = setInterval(async () => {
     if (!adminState.isAuthenticated || !ApiClient.token) return;
 
-    // Pause polling if browser tab is hidden or admin tab is not active (saves Vercel invocations)
+    // Pause polling only when browser tab is minimized/hidden
     if (document.hidden) return;
-    const adminTab = document.getElementById('admin-tab');
-    if (!adminTab || !adminTab.classList.contains('active')) return;
 
     try {
-      // Fetch lightweight overrides map (~200 bytes) instead of full 270 records
-      const syncData = await ApiClient.getSyncLatest();
-      if (syncData && syncData.syncedAt !== lastSyncTimestamp) {
-        lastSyncTimestamp = syncData.syncedAt;
-        let hasChanges = false;
-
-        if (syncData.overrides) {
-          appData.beneficiaries.forEach(b => {
-            const ov = syncData.overrides[b.sr_no];
-            if (ov) {
-              if (ov.onboarded !== undefined && b.onboarded !== ov.onboarded) {
-                b.onboarded = ov.onboarded;
-                hasChanges = true;
-              }
-              if (ov.rc_onboarded !== undefined && b.rc_onboarded !== ov.rc_onboarded) {
-                b.rc_onboarded = ov.rc_onboarded;
-                hasChanges = true;
-              }
-              if (ov.version !== undefined) {
-                adminState.versions[b.sr_no] = ov.version;
-              }
-            }
-          });
-        }
-
-        if (hasChanges) {
-          groupHouseholds();
-          renderStats();
-          renderList();
-        }
-        // Always render dashboard to update live sync timestamp badge and KPI counters
-        renderAdminDashboard();
-      }
+      await loadDataFromAPI();
+      groupHouseholds();
+      renderStats();
+      renderList();
+      renderAdminDashboard();
     } catch (e) {
-      console.warn('5s smart sync failed:', e.message);
+      console.warn('Auto-refresh failed:', e.message);
     }
   }, 5000); // 5 seconds interval
 }
