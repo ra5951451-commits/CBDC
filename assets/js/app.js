@@ -4577,8 +4577,10 @@ function initAdminAuth() {
         pinError.style.display = 'block';
         if (err.status === 429) {
           pinError.textContent = '⏳ ઘણા વધુ પ્રયાસ. કૃપા કરીને થોડી વાર પછી ફરી પ્રયત્ન કરો.';
-        } else {
+        } else if (err.status === 401) {
           pinError.textContent = '❌ ખોટો આઈડી/પાસવર્ડ';
+        } else {
+          pinError.textContent = '⚠️ સર્વર એરર: Vercel પર Environment Variables ઉમેરો (અથવા Redeploy કરો).';
         }
       }
     } finally {
