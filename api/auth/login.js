@@ -81,6 +81,6 @@ module.exports = async function handler(req, res) {
 
   } catch (err) {
     console.error('Login error:', err.message);
-    return sendError(res, 500, 'Internal server error');
+    return sendError(res, 500, err.message || 'Internal server error');
   }
 };
