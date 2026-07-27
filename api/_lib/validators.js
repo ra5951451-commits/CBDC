@@ -14,7 +14,7 @@ function validateLoginInput(body) {
     return { valid: false, error: 'Request body is required' };
   }
 
-  const username = typeof body.username === 'string' ? body.username.trim() : '';
+  const username = typeof body.username === 'string' ? body.username.trim().toLowerCase() : '';
   const password = typeof body.password === 'string' ? body.password : '';
 
   if (!username) {
