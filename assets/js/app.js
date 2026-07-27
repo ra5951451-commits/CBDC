@@ -4071,21 +4071,56 @@ function scheduleSessionExpiryTimer(msRemaining) {
   }, msRemaining);
 }
 
-/** Start auto-refresh: re-sync data from server every 60 seconds when admin tab is active */
+let lastSyncTimestamp = null;
+
+/** Start smart 5-second auto-refresh: lightweight sync every 5 seconds when admin tab is active */
 function startAutoRefresh() {
   stopAutoRefresh();
   autoRefreshInterval = setInterval(async () => {
     if (!adminState.isAuthenticated || !ApiClient.token) return;
-    // Only refresh if admin tab is visible
+
+    // Pause polling if browser tab is hidden or admin tab is not active (saves Vercel invocations)
+    if (document.hidden) return;
     const adminTab = document.getElementById('admin-tab');
     if (!adminTab || !adminTab.classList.contains('active')) return;
+
     try {
-      await loadDataFromAPI();
-      renderAdminDashboard();
+      // Fetch lightweight overrides map (~200 bytes) instead of full 270 records
+      const syncData = await ApiClient.getSyncLatest();
+      if (syncData && syncData.syncedAt !== lastSyncTimestamp) {
+        lastSyncTimestamp = syncData.syncedAt;
+        let hasChanges = false;
+
+        if (syncData.overrides) {
+          appData.beneficiaries.forEach(b => {
+            const ov = syncData.overrides[b.sr_no];
+            if (ov) {
+              if (ov.onboarded !== undefined && b.onboarded !== ov.onboarded) {
+                b.onboarded = ov.onboarded;
+                hasChanges = true;
+              }
+              if (ov.rc_onboarded !== undefined && b.rc_onboarded !== ov.rc_onboarded) {
+                b.rc_onboarded = ov.rc_onboarded;
+                hasChanges = true;
+              }
+              if (ov.version !== undefined) {
+                adminState.versions[b.sr_no] = ov.version;
+              }
+            }
+          });
+        }
+
+        if (hasChanges) {
+          groupHouseholds();
+          renderStats();
+          renderList();
+          renderAdminDashboard();
+        }
+      }
     } catch (e) {
-      console.warn('Auto-refresh failed:', e.message);
+      console.warn('5s smart sync failed:', e.message);
     }
-  }, 15000); // 15-second sync — near-real-time multi-device updates
+  }, 5000); // 5 seconds interval
 }
 
 function stopAutoRefresh() {
