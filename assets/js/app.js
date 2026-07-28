@@ -4322,8 +4322,19 @@ async function loadData() {
   }
   
   filterState.filteredHouseholds = [...appData.households];
-  renderStats();
-  renderList();
+
+  // Hide skeletons on first data load, then render content
+  if (!_initialDataLoaded) {
+    _initialDataLoaded = true;
+    hideHomeStatsSkeletons();
+    hideSkeleton('beneficiaries-list', () => {
+      renderStats();
+      renderList();
+    });
+  } else {
+    renderStats();
+    renderList();
+  }
 }
 
 function groupHouseholds() {
@@ -4543,6 +4554,8 @@ function initAdminAuth() {
       if (authCard) authCard.style.display = 'none';
       if (dashWrapper) dashWrapper.style.display = 'block';
       if (pinError) pinError.style.display = 'none';
+      // Show admin skeletons while restoring session data
+      showAdminSkeletons();
       // Reload data from API after session restore
       loadData().then(() => {
         switchTataliSubpage(adminState.activeSubpage || 'dashboard');
@@ -4573,6 +4586,9 @@ function initAdminAuth() {
       if (passInput) passInput.value = '';
 
       showToast(`🔓 સ્વાગત છે ${result.user.username}! તલાટી લૉગિન સફળ થયું. (${sess.sessionId})`);
+
+      // Show admin skeletons while data loads
+      showAdminSkeletons();
 
       // Load data from backend API
       await loadData();
@@ -4680,6 +4696,13 @@ window.switchTataliSubpage = switchTataliSubpage;
 
 function renderAdminDashboard() {
   if (!adminState.isAuthenticated) return;
+
+  // Hide admin skeletons (no-op if already hidden)
+  hideAdminKpiSkeletons();
+  _activeSkeletons.delete('admin-table-body');
+  _activeSkeletons.delete('shared-mobiles-list');
+  _activeSkeletons.delete('family-breakdown-grid');
+  _activeSkeletons.delete('card-types-grid');
 
   const totalMembers = appData.beneficiaries.length;
   const totalCards = appData.households.length;
@@ -5315,6 +5338,263 @@ function initLightbox() {
 }
 
 /* ==========================================================================
+   Skeleton Loading System — Show/Hide Shimmer Placeholders
+   ========================================================================== */
+
+/** Track which containers have active skeletons to avoid re-showing during auto-refresh */
+const _activeSkeletons = new Set();
+
+/** Track if initial data has loaded (skeletons only show on first load, not auto-refresh) */
+let _initialDataLoaded = false;
+
+/**
+ * Generate skeleton placeholder HTML for a given component type.
+ * @param {'stat-card'|'household-card'|'kpi-card'|'table-row'|'shared-mobile'|'breakdown-card'} type
+ * @param {number} count — Number of skeleton items to generate
+ * @returns {string} HTML string
+ */
+function generateSkeletonHTML(type, count) {
+  let items = '';
+  for (let i = 0; i < count; i++) {
+    switch (type) {
+      case 'stat-card':
+        items += `
+          <div class="skeleton-stat-card">
+            <div class="skeleton-bone skeleton-circle"></div>
+            <div class="skeleton-info">
+              <div class="skeleton-bone skeleton-text w-70"></div>
+              <div class="skeleton-bone skeleton-text w-50"></div>
+            </div>
+          </div>`;
+        break;
+
+      case 'household-card':
+        items += `
+          <div class="skeleton-household-card">
+            <div class="skeleton-hc-header">
+              <div class="skeleton-bone skeleton-text w-50"></div>
+              <div class="skeleton-bone skeleton-text w-30" style="height:20px;"></div>
+            </div>
+            <div class="skeleton-hc-body">
+              <div class="skeleton-bone skeleton-text w-40" style="height:10px; margin-bottom:4px;"></div>
+              <div class="skeleton-member-row">
+                <div class="skeleton-member-left">
+                  <div class="skeleton-bone" style="width:18px;height:18px;border-radius:50%;"></div>
+                  <div class="skeleton-bone skeleton-text w-70"></div>
+                </div>
+                <div class="skeleton-bone skeleton-text" style="width:70px;"></div>
+              </div>
+              <div class="skeleton-member-row">
+                <div class="skeleton-member-left">
+                  <div class="skeleton-bone" style="width:18px;height:18px;border-radius:50%;"></div>
+                  <div class="skeleton-bone skeleton-text w-80"></div>
+                </div>
+                <div class="skeleton-bone skeleton-text" style="width:60px;"></div>
+              </div>
+            </div>
+            <div class="skeleton-hc-footer">
+              <div class="skeleton-bone skeleton-text w-40" style="height:10px;"></div>
+              <div class="skeleton-bone skeleton-text w-30" style="height:10px;"></div>
+            </div>
+          </div>`;
+        break;
+
+      case 'kpi-card':
+        items += `
+          <div class="skeleton-kpi-card">
+            <div class="skeleton-bone skeleton-text w-70" style="height:12px;"></div>
+            <div class="skeleton-bone skeleton-text w-40 h-24"></div>
+            <div class="skeleton-bone skeleton-text h-6"></div>
+            <div class="skeleton-bone skeleton-text w-50" style="height:11px;"></div>
+          </div>`;
+        break;
+
+      case 'table-row':
+        items += `
+          <tr class="skeleton-table-row">
+            <td><div class="skeleton-bone skeleton-text" style="width:28px;height:14px;"></div></td>
+            <td><div class="skeleton-bone skeleton-text" style="width:120px;"></div></td>
+            <td><div class="skeleton-bone skeleton-text" style="width:90px;"></div></td>
+            <td><div class="skeleton-bone skeleton-text" style="width:40px;"></div></td>
+            <td><div class="skeleton-bone skeleton-text" style="width:85px;"></div></td>
+            <td><div class="skeleton-bone skeleton-text" style="width:70px;height:20px;border-radius:10px;"></div></td>
+            <td><div class="skeleton-bone" style="width:36px;height:18px;border-radius:9px;"></div></td>
+            <td><div class="skeleton-bone skeleton-text" style="width:50px;height:20px;border-radius:10px;"></div></td>
+            <td><div class="skeleton-bone" style="width:36px;height:18px;border-radius:9px;"></div></td>
+          </tr>`;
+        break;
+
+      case 'shared-mobile':
+        items += `
+          <div class="skeleton-shared-mobile">
+            <div class="skeleton-sm-header">
+              <div class="skeleton-bone skeleton-text w-40"></div>
+              <div class="skeleton-bone skeleton-text w-30" style="height:18px;"></div>
+            </div>
+            <div class="skeleton-sm-members">
+              <div class="skeleton-bone skeleton-text w-80" style="height:12px;"></div>
+              <div class="skeleton-bone skeleton-text w-70" style="height:12px;"></div>
+            </div>
+          </div>`;
+        break;
+
+      case 'breakdown-card':
+        items += `
+          <div class="skeleton-breakdown-card">
+            <div class="skeleton-bone skeleton-text w-50 h-24"></div>
+            <div class="skeleton-bone skeleton-text w-70" style="height:12px;"></div>
+          </div>`;
+        break;
+    }
+  }
+  return items;
+}
+
+/**
+ * Show skeleton placeholders in a container.
+ * @param {string} containerId — DOM element ID to inject skeletons into
+ * @param {string} type — Skeleton type (see generateSkeletonHTML)
+ * @param {number} count — Number of skeleton items
+ * @param {string} [wrapperClass] — Optional CSS class for the skeleton wrapper div
+ */
+function showSkeleton(containerId, type, count, wrapperClass) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Don't re-inject if skeletons are already showing
+  if (_activeSkeletons.has(containerId)) return;
+
+  const skeletonHTML = generateSkeletonHTML(type, count);
+  const wrapper = wrapperClass
+    ? `<div class="skeleton-container ${wrapperClass}">${skeletonHTML}</div>`
+    : `<div class="skeleton-container">${skeletonHTML}</div>`;
+
+  // For table bodies, inject rows directly
+  if (type === 'table-row') {
+    container.innerHTML = skeletonHTML;
+  } else {
+    container.innerHTML = wrapper;
+  }
+
+  _activeSkeletons.add(containerId);
+}
+
+/**
+ * Hide skeleton with fade-out animation, then run callback.
+ * @param {string} containerId — DOM element ID containing skeletons
+ * @param {Function} [callback] — Called after skeleton is removed
+ */
+function hideSkeleton(containerId, callback) {
+  if (!_activeSkeletons.has(containerId)) {
+    if (callback) callback();
+    return;
+  }
+
+  const container = document.getElementById(containerId);
+  if (!container) {
+    _activeSkeletons.delete(containerId);
+    if (callback) callback();
+    return;
+  }
+
+  const skeletonWrapper = container.querySelector('.skeleton-container');
+  if (skeletonWrapper) {
+    skeletonWrapper.classList.add('hiding');
+    setTimeout(() => {
+      _activeSkeletons.delete(containerId);
+      if (callback) callback();
+    }, 300);
+  } else {
+    // Table rows (no wrapper) — just clear
+    _activeSkeletons.delete(containerId);
+    if (callback) callback();
+  }
+}
+
+/** Show initial skeletons on page load for public-facing components */
+function showInitialSkeletons() {
+  // Home stats grid — show skeleton stat cards overlaid
+  const statsGrid = document.querySelector('.home-stats-grid');
+  if (statsGrid) {
+    // Store original stat cards
+    statsGrid.dataset.originalHtml = statsGrid.innerHTML;
+    statsGrid.innerHTML = `<div class="skeleton-container skeleton-stats-grid">${generateSkeletonHTML('stat-card', 4)}</div>`;
+    _activeSkeletons.add('home-stats-grid');
+  }
+
+  // Beneficiary list
+  showSkeleton('beneficiaries-list', 'household-card', 6);
+}
+
+/** Hide home stats skeletons and restore real stat cards */
+function hideHomeStatsSkeletons() {
+  const statsGrid = document.querySelector('.home-stats-grid');
+  if (!statsGrid || !_activeSkeletons.has('home-stats-grid')) return;
+
+  const skeletonWrapper = statsGrid.querySelector('.skeleton-container');
+  if (skeletonWrapper) {
+    skeletonWrapper.classList.add('hiding');
+    setTimeout(() => {
+      // Restore original stat cards
+      if (statsGrid.dataset.originalHtml) {
+        statsGrid.innerHTML = statsGrid.dataset.originalHtml;
+        delete statsGrid.dataset.originalHtml;
+      }
+      _activeSkeletons.delete('home-stats-grid');
+    }, 300);
+  }
+}
+
+/** Show admin section skeletons after login */
+function showAdminSkeletons() {
+  // KPI grid
+  const kpiGrid = document.querySelector('.admin-kpi-grid');
+  if (kpiGrid) {
+    kpiGrid.dataset.originalHtml = kpiGrid.innerHTML;
+    kpiGrid.innerHTML = `<div class="skeleton-container skeleton-kpi-grid">${generateSkeletonHTML('kpi-card', 5)}</div>`;
+    _activeSkeletons.add('admin-kpi-grid');
+  }
+
+  // Admin table
+  showSkeleton('admin-table-body', 'table-row', 8);
+
+  // Shared mobiles
+  showSkeleton('shared-mobiles-list', 'shared-mobile', 5);
+
+  // Family breakdown
+  const familyGrid = document.getElementById('family-breakdown-grid');
+  if (familyGrid) {
+    familyGrid.innerHTML = `<div class="skeleton-container skeleton-breakdown-grid">${generateSkeletonHTML('breakdown-card', 4)}</div>`;
+    _activeSkeletons.add('family-breakdown-grid');
+  }
+
+  // Card types
+  const cardTypesGrid = document.getElementById('card-types-grid');
+  if (cardTypesGrid) {
+    cardTypesGrid.innerHTML = `<div class="skeleton-container skeleton-breakdown-grid">${generateSkeletonHTML('breakdown-card', 4)}</div>`;
+    _activeSkeletons.add('card-types-grid');
+  }
+}
+
+/** Hide admin KPI skeletons and restore real KPI cards */
+function hideAdminKpiSkeletons() {
+  const kpiGrid = document.querySelector('.admin-kpi-grid');
+  if (!kpiGrid || !_activeSkeletons.has('admin-kpi-grid')) return;
+
+  const skeletonWrapper = kpiGrid.querySelector('.skeleton-container');
+  if (skeletonWrapper) {
+    skeletonWrapper.classList.add('hiding');
+    setTimeout(() => {
+      if (kpiGrid.dataset.originalHtml) {
+        kpiGrid.innerHTML = kpiGrid.dataset.originalHtml;
+        delete kpiGrid.dataset.originalHtml;
+      }
+      _activeSkeletons.delete('admin-kpi-grid');
+    }, 300);
+  }
+}
+
+/* ==========================================================================
    7. Application Bootstrapping
    ========================================================================== */
 
@@ -5322,6 +5602,7 @@ document.addEventListener('DOMContentLoaded', () => {
   getOrCreateSessionId();
   initRouter();
   initSearchListeners();
+  showInitialSkeletons();
   loadData();
   initAdminAuth();
   initLightbox();
