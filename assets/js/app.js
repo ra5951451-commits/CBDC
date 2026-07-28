@@ -4091,7 +4091,7 @@ function startAutoRefresh() {
     } catch (e) {
       console.warn('Auto-refresh failed:', e.message);
     }
-  }, 5000); // 5 seconds interval
+  }, 1000); // 1 second interval
 }
 
 function stopAutoRefresh() {
@@ -4548,20 +4548,10 @@ function initAdminAuth() {
   const logoutBtn = document.getElementById('admin-logout-btn');
   const exportBtn = document.getElementById('admin-export-json-btn');
 
-  // Auto-restore 30-minute active session on refresh or browser re-open
-  checkAndRestoreAdminSession().then(isRestored => {
-    if (isRestored) {
-      if (authCard) authCard.style.display = 'none';
-      if (dashWrapper) dashWrapper.style.display = 'block';
-      if (pinError) pinError.style.display = 'none';
-      // Show admin skeletons while restoring session data
-      showAdminSkeletons();
-      // Reload data from API after session restore
-      loadData().then(() => {
-        switchTataliSubpage(adminState.activeSubpage || 'dashboard');
-      });
-    }
-  });
+  // NOTE: Session restore + initial data load now happens earlier, in the
+  // DOMContentLoaded bootstrap below (before the first loadData() call),
+  // so the admin dashboard is painted once with correct data instead of
+  // once with stale local data and then again with fresh API data.
 
   const attemptLogin = async () => {
     const u = userInput ? userInput.value.trim() : '';
@@ -5598,12 +5588,35 @@ function hideAdminKpiSkeletons() {
    7. Application Bootstrapping
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   getOrCreateSessionId();
   initRouter();
   initSearchListeners();
   showInitialSkeletons();
-  loadData();
-  initAdminAuth();
+  initAdminAuth(); // wires up login/logout/search/etc. UI handlers only (no data load)
   initLightbox();
+
+  // Restore a previously-logged-in Talati session BEFORE the first data load.
+  // If there's no session in localStorage this resolves instantly (no network
+  // call), so public visitors see no added delay. If a session IS restored,
+  // we show the admin skeletons and go straight to the API for fresh data —
+  // avoiding a first paint of stale local data followed by a second paint
+  // of fresh server data.
+  const isRestored = await checkAndRestoreAdminSession();
+
+  if (isRestored) {
+    const authCard = document.getElementById('admin-auth-card');
+    const dashWrapper = document.getElementById('admin-dashboard-wrapper');
+    const pinError = document.getElementById('admin-pin-error');
+    if (authCard) authCard.style.display = 'none';
+    if (dashWrapper) dashWrapper.style.display = 'block';
+    if (pinError) pinError.style.display = 'none';
+    showAdminSkeletons();
+  }
+
+  await loadData();
+
+  if (isRestored) {
+    switchTataliSubpage(adminState.activeSubpage || 'dashboard');
+  }
 });
